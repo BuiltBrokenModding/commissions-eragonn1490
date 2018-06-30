@@ -1,0 +1,19 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "triggerblockmod:trigger_disabled"
+  },
+  "variants": {
+    "inventory": {
+      "model": "triggerblockmod:trigger_disabled"
+    },
+    "powered": {
+      "false": {
+        "model": "triggerblockmod:trigger_disabled"
+      },
+      "true": {
+        "model": "triggerblockmod:trigger_enabled"
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "triggerblockmod:blocks/trigger_enabled"
+    }
+}

@@ -1,0 +1,11 @@
+tile.triggerblockmod:trigger.name=Trigger Block
+tile.triggerblockmod:trigger.info.set.new=Frequency is set to %s
+tile.triggerblockmod:trigger.info.set.already=Frequency is already set, use a Zeroizer before setting a new value
+tile.triggerblockmod:trigger.info.triggered.true=Trigger is activated
+tile.triggerblockmod:trigger.info.triggered.false=Trigger is deactivated
+
+item.triggerblockmod:trigger.clear.name=Trigger Zeroizer
+item.triggerblockmod:trigger.clear.info.cleared=Frequency reset on block
+
+item.triggerblockmod:trigger.remote.name=Trigger Remote
+item.triggerblockmod:trigger.remote.info.result=Activated %s blocks and Deactivated %s blocks
