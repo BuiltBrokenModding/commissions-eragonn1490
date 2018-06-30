@@ -1,5 +1,6 @@
 package com.builtbroken.energystorageblock.mods.ic2;
 
+import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import com.builtbroken.energystorageblock.mods.ModProxy;
 import ic2.api.energy.event.EnergyTileLoadEvent;
@@ -9,7 +10,6 @@ import ic2.api.energy.tile.IEnergyTile;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
 /**
@@ -22,7 +22,7 @@ public class IC2Proxy extends ModProxy
 
     @Override
     @Optional.Method(modid = "ic2")
-    public boolean outputPower(IEnergyStorage storage, TileEntity target, EnumFacing enumFacing)
+    public boolean outputPower(TileEntityEnergyStorage energyStorage, TileEntity target, EnumFacing enumFacing)
     {
         if (target instanceof IEnergySink && ((IEnergySink) target).acceptsEnergyFrom(null, enumFacing))
         {
@@ -31,7 +31,7 @@ public class IC2Proxy extends ModProxy
             int request = (int) Math.floor(demand * ConfigPowerSystem.FROM_IC2);
 
             //Check how much power we can remove
-            int give = storage.extractEnergy(request, true);
+            int give = energyStorage.energyStorage.extractEnergy(request, true);
 
             //Convert give to IC2
             double inject = give / ConfigPowerSystem.FROM_IC2;
@@ -42,7 +42,7 @@ public class IC2Proxy extends ModProxy
             //Remove energy from storage
             inject -= leftOver;
             int remove = (int) Math.ceil(inject * ConfigPowerSystem.FROM_IC2);
-            storage.extractEnergy(remove, false);
+            energyStorage.energyStorage.extractEnergy(remove, false);
             return true;
         }
         return false;

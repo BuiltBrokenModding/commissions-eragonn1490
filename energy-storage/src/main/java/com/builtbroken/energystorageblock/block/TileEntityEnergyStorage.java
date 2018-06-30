@@ -71,7 +71,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     {
         for (ModProxy proxy : EnergyStorageBlockMod.modProxies)
         {
-            if (proxy.outputPower(energyStorage, target, side))
+            if (proxy.outputPower(this, target, side))
             {
                 return true;
             }

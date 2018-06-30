@@ -16,7 +16,16 @@ public class ConfigPowerSystem
     @Config.RangeInt(min = 0)
     public static double FROM_IC2 = 4D; //Matched with Mekanism
 
-    @Config.Name("disable")
+    @Config.Name("from_buildcraft")
+    @Config.Comment("How much (MJ) builcraft energy to turn into (FE) Forge energy")
+    @Config.RangeInt(min = 0)
+    public static double FROM_BUILDCRAFT = 200D;
+
+    @Config.Name("enable_ic2")
     @Config.Comment("Set to true to enable IC2 (EU) power support. Requires restart to take full effect.")
     public static boolean ENABLE_IC2 = true;
+
+    @Config.Name("enable_buildcraft")
+    @Config.Comment("Set to true to enable buildcraft (MJ) power support. Requires restart to take full effect.")
+    public static boolean ENABLE_BUILDCRAFT = true;
 }

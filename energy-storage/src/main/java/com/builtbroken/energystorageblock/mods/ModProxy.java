@@ -1,8 +1,8 @@
 package com.builtbroken.energystorageblock.mods;
 
+import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.energy.IEnergyStorage;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -28,12 +28,12 @@ public class ModProxy
     /**
      * Called to output power
      *
-     * @param storage    - storage to drain power from
-     * @param target     - tile to feed power
-     * @param enumFacing - side of target
+     * @param energyStorage - tile giving power
+     * @param target        - tile to feed power
+     * @param enumFacing    - side of target
      * @return true to consume action
      */
-    public boolean outputPower(IEnergyStorage storage, TileEntity target, EnumFacing enumFacing)
+    public boolean outputPower(TileEntityEnergyStorage energyStorage, TileEntity target, EnumFacing enumFacing)
     {
         return false;
     }
