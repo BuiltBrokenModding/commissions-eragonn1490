@@ -1,0 +1,14 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "energystorageblock:energy_storage"
+  },
+  "variants": {
+    "normal": {
+      "model": "energystorageblock:energy_storage"
+    },
+    "inventory": {
+      "model": "energystorageblock:energy_storage"
+    }
+  }
+}
