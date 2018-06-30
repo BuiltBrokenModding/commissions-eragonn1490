@@ -1,2 +1,2 @@
 tile.energystorageblock:energy.storage.name=Energy Storage Block
-tile.energystorageblock:energy.storage.info.power.name=Energy: %d / %d FE
+tile.energystorageblock:energy.storage.info.power=Energy: %d / %d FE

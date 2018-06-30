@@ -5,8 +5,10 @@ import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import com.builtbroken.energystorageblock.energy.EnergyBlockStorage;
 import com.builtbroken.energystorageblock.mods.ModProxy;
+import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
+import ic2.api.energy.tile.IEnergySource;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -26,7 +28,7 @@ import javax.annotation.Nullable;
 @Optional.InterfaceList({
         @Optional.Interface(iface = "ic2.api.energy.tile.IEnergySink", modid = "ic2")
 })
-public class TileEntityEnergyStorage extends TileEntity implements ITickable, IEnergySink
+public class TileEntityEnergyStorage extends TileEntity implements ITickable, IEnergySink, IEnergySource
 {
     public static final String NBT_ENERGY = "energy";
 
@@ -144,6 +146,36 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     @Override
     @Optional.Method(modid = "ic2")
     public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing side)
+    {
+        return ConfigPowerSystem.ENABLE_IC2 && hasCapability(CapabilityEnergy.ENERGY, side);
+    }
+
+
+    @Override
+    @Optional.Method(modid = "ic2")
+    public double getOfferedEnergy()
+    {
+        return energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true) / ConfigPowerSystem.FROM_IC2;
+    }
+
+    @Override
+    @Optional.Method(modid = "ic2")
+    public void drawEnergy(double amount)
+    {
+        int energy = (int) Math.ceil(amount * ConfigPowerSystem.FROM_IC2);
+        energyStorage.extractEnergy(energy, false);
+    }
+
+    @Override
+    @Optional.Method(modid = "ic2")
+    public int getSourceTier()
+    {
+        return 1; //Might need increased to allow more power flow
+    }
+
+    @Override
+    @Optional.Method(modid = "ic2")
+    public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing side)
     {
         return ConfigPowerSystem.ENABLE_IC2 && hasCapability(CapabilityEnergy.ENERGY, side);
     }
