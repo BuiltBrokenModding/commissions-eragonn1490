@@ -68,6 +68,14 @@ public class BlockEnergyStorage extends Block implements ITileEntityProvider
                 }
                 return true;
             }
+            else
+            {
+                if (!worldIn.isRemote)
+                {
+                    playerIn.openGui(EnergyStorageBlockMod.DOMAIN, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                }
+                return true;
+            }
         }
         return false;
     }

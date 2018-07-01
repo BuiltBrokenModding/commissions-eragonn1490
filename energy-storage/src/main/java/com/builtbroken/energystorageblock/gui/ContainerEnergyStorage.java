@@ -2,7 +2,9 @@ package com.builtbroken.energystorageblock.gui;
 
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraftforge.items.SlotItemHandler;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -12,10 +14,11 @@ public class ContainerEnergyStorage extends Container
 {
     private final TileEntityEnergyStorage energyStorage;
 
-    public ContainerEnergyStorage(TileEntityEnergyStorage energyStorage, EntityPlayer player)
+    public ContainerEnergyStorage(EntityPlayer player, TileEntityEnergyStorage energyStorage)
     {
         this.energyStorage = energyStorage;
-
+        this.addSlotToContainer(new SlotItemHandler(energyStorage.inventory, 0, 44, 37));
+        this.addSlotToContainer(new SlotItemHandler(energyStorage.inventory, 1, 116, 37));
 
         //Add player inventory
         for (int i = 0; i < 3; ++i)

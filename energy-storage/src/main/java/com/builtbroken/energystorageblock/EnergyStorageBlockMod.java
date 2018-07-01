@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class EnergyStorageBlockMod
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+
         if (Loader.isModLoaded("ic2"))
         {
             energyModProxies.add(IC2Proxy.INSTANCE);
