@@ -2,7 +2,7 @@ package com.builtbroken.energystorageblock;
 
 import com.builtbroken.energystorageblock.block.BlockEnergyStorage;
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
-import com.builtbroken.energystorageblock.mods.ModProxy;
+import com.builtbroken.energystorageblock.mods.EnergyModProxy;
 import com.builtbroken.energystorageblock.mods.buildcraft.BuildcraftProxy;
 import com.builtbroken.energystorageblock.mods.ic2.IC2Proxy;
 import net.minecraft.block.Block;
@@ -36,33 +36,33 @@ public class EnergyStorageBlockMod
     @Mod.Instance(DOMAIN)
     public static EnergyStorageBlockMod INSTANCE;
 
-    public static List<ModProxy> modProxies = new ArrayList();
+    public static List<EnergyModProxy> energyModProxies = new ArrayList();
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         if (Loader.isModLoaded("ic2"))
         {
-            modProxies.add(IC2Proxy.INSTANCE);
+            energyModProxies.add(IC2Proxy.INSTANCE);
         }
         if (Loader.isModLoaded("buildcraftenergy"))
         {
-            modProxies.add(BuildcraftProxy.INSTANCE);
+            energyModProxies.add(BuildcraftProxy.INSTANCE);
         }
 
-        modProxies.forEach(proxy -> proxy.preInit());
+        energyModProxies.forEach(proxy -> proxy.preInit());
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event)
     {
-        modProxies.forEach(proxy -> proxy.init());
+        energyModProxies.forEach(proxy -> proxy.init());
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
-        modProxies.forEach(proxy -> proxy.postInit());
+        energyModProxies.forEach(proxy -> proxy.postInit());
     }
 
     @SubscribeEvent

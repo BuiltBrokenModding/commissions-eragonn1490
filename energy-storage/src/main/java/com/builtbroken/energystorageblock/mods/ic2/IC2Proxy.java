@@ -1,8 +1,7 @@
 package com.builtbroken.energystorageblock.mods.ic2;
 
-import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
-import com.builtbroken.energystorageblock.mods.ModProxy;
+import com.builtbroken.energystorageblock.mods.EnergyModProxy;
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergySink;
@@ -11,21 +10,22 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 5/22/2018.
  */
-public class IC2Proxy extends ModProxy
+public class IC2Proxy extends EnergyModProxy
 {
     public static final IC2Proxy INSTANCE = new IC2Proxy();
 
     @Override
     @Optional.Method(modid = "ic2")
-    public boolean outputPower(TileEntityEnergyStorage tile, TileEntity target, EnumFacing enumFacing)
+    public boolean outputPower(TileEntity target, TileEntity source, IEnergyStorage energyStorage, EnumFacing enumFacing)
     {
-        if (tile.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
+        if (source.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
         {
             if (target instanceof IEnergySink && ((IEnergySink) target).acceptsEnergyFrom(null, enumFacing))
             {
@@ -34,7 +34,7 @@ public class IC2Proxy extends ModProxy
                 int request = (int) Math.floor(demand * ConfigPowerSystem.FROM_IC2);
 
                 //Check how much power we can remove
-                int give = tile.energyStorage.extractEnergy(request, true);
+                int give = energyStorage.extractEnergy(request, true);
 
                 //Convert give to IC2
                 double inject = give / ConfigPowerSystem.FROM_IC2;
@@ -45,7 +45,7 @@ public class IC2Proxy extends ModProxy
                 //Remove energy from storage
                 inject -= leftOver;
                 int remove = (int) Math.ceil(inject * ConfigPowerSystem.FROM_IC2);
-                tile.energyStorage.extractEnergy(remove, false);
+                energyStorage.extractEnergy(remove, false);
                 return true;
             }
         }

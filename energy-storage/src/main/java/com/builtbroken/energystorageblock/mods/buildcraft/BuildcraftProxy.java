@@ -5,12 +5,13 @@ import buildcraft.api.mj.MjAPI;
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
-import com.builtbroken.energystorageblock.mods.ModProxy;
+import com.builtbroken.energystorageblock.mods.EnergyModProxy;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -18,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 5/22/2018.
  */
-public class BuildcraftProxy extends ModProxy
+public class BuildcraftProxy extends EnergyModProxy
 {
     public static final String BC = "buildcraftenergy";
     public static final BuildcraftProxy INSTANCE = new BuildcraftProxy();
@@ -41,10 +42,10 @@ public class BuildcraftProxy extends ModProxy
     }
 
     @Override
-    public boolean outputPower(TileEntityEnergyStorage tile, TileEntity target, EnumFacing enumFacing)
+    public boolean outputPower(TileEntity target, TileEntity source, IEnergyStorage energyStorage, EnumFacing enumFacing)
     {
         //Check that we support output for side
-        if (tile.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
+        if (source.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
         {
             //Check that target can receive energy
             if (target.hasCapability(MjAPI.CAP_RECEIVER, enumFacing))
@@ -57,7 +58,7 @@ public class BuildcraftProxy extends ModProxy
                     {
                         //Convert and check extract
                         int energy = (int) Math.floor(request * ConfigPowerSystem.FROM_BUILDCRAFT);
-                        energy = tile.energyStorage.extractEnergy(energy, true);
+                        energy = energyStorage.extractEnergy(energy, true);
 
                         if (energy > 0)
                         {
@@ -70,7 +71,7 @@ public class BuildcraftProxy extends ModProxy
 
                             //convert and remove energy
                             energy = (int) Math.ceil(taken * ConfigPowerSystem.FROM_BUILDCRAFT);
-                            tile.energyStorage.extractEnergy(energy, false);
+                            energyStorage.extractEnergy(energy, false);
                         }
                     }
                     return true;

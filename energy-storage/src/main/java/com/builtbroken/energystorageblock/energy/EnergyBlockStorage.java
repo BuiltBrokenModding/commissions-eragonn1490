@@ -1,5 +1,6 @@
 package com.builtbroken.energystorageblock.energy;
 
+import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -11,36 +12,48 @@ public class EnergyBlockStorage implements IEnergyStorage
 {
     protected int energy;
 
+    public final TileEntityEnergyStorage host;
+
+    public EnergyBlockStorage(TileEntityEnergyStorage host)
+    {
+        this.host = host;
+    }
+
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate)
     {
-        if (!canReceive())
+        if (canReceive() && maxReceive > 0)
         {
-            return 0;
-        }
 
-        int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(ConfigEnergyStorage.INPUT_LIMIT, maxReceive));
-        if (!simulate)
-        {
-            energy += energyReceived;
+            int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(ConfigEnergyStorage.INPUT_LIMIT, maxReceive));
+            if (!simulate)
+            {
+                energy += energyReceived;
+
+                //Mark the tile has changed so it saves
+                host.markDirty();
+            }
+            return energyReceived;
         }
-        return energyReceived;
+        return 0;
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate)
     {
-        if (!canExtract())
+        if (canExtract() && maxExtract > 0)
         {
-            return 0;
-        }
+            int energyExtracted = Math.min(energy, Math.min(ConfigEnergyStorage.OUTPUT_LIMIT, maxExtract));
+            if (!simulate)
+            {
+                energy -= energyExtracted;
 
-        int energyExtracted = Math.min(energy, Math.min(ConfigEnergyStorage.OUTPUT_LIMIT, maxExtract));
-        if (!simulate)
-        {
-            energy -= energyExtracted;
+                //Mark the tile has changed so it saves
+                host.markDirty();
+            }
+            return energyExtracted;
         }
-        return energyExtracted;
+        return 0;
     }
 
     @Override

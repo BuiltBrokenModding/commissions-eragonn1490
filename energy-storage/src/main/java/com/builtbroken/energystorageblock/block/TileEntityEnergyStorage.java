@@ -6,11 +6,12 @@ import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import com.builtbroken.energystorageblock.energy.EnergyBlockStorage;
 import com.builtbroken.energystorageblock.energy.EnergySideState;
 import com.builtbroken.energystorageblock.energy.EnergySideWrapper;
-import com.builtbroken.energystorageblock.mods.ModProxy;
+import com.builtbroken.energystorageblock.mods.EnergyModProxy;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -20,6 +21,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,10 +35,21 @@ import javax.annotation.Nullable;
 })
 public class TileEntityEnergyStorage extends TileEntity implements ITickable, IEnergySink, IEnergySource
 {
+    //NBT keys
     public static final String NBT_ENERGY = "energy";
     public static final String NBT_ENERGY_SIDES = "energy_sides";
 
-    public final EnergyBlockStorage energyStorage = new EnergyBlockStorage();
+    //Inventory constants
+    public static final int INVENTORY_SIZE = 2;
+    public static final int SLOT_BATTERY_INPUT = 0;
+    public static final int SLOT_BATTERY_OUTPUT = 1;
+
+    /** Main power storage */
+    public final EnergyBlockStorage energyStorage = new EnergyBlockStorage(this);
+    /** Main inventory */
+    public final ItemStackHandler inventory = new ItemStackHandler(INVENTORY_SIZE);
+
+    //Side handler for input/output/disconnect state
     private EnergySideWrapper[] energySideWrapper = new EnergySideWrapper[6];
 
     @Override
@@ -44,47 +57,97 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     {
         if (!world.isRemote && energyStorage.getEnergyStored() > 0)
         {
-            for (EnumFacing enumFacing : EnumFacing.VALUES)
+            //Pull power in first
+            dischargeBattery();
+            //Output to charge item, second to allow users to charge items
+            chargeBattery();
+            //Last handle connected tiles
+            handlePowerTiles();
+        }
+    }
+
+    protected void dischargeBattery()
+    {
+        ItemStack batteryToDischarge = inventory.getStackInSlot(SLOT_BATTERY_INPUT);
+        if (!batteryToDischarge.isEmpty())
+        {
+            if (batteryToDischarge.hasCapability(CapabilityEnergy.ENERGY, null))
             {
-                if (getEnergySideWrapper(enumFacing).sideState == EnergySideState.OUTPUT)
+                IEnergyStorage storage = batteryToDischarge.getCapability(CapabilityEnergy.ENERGY, null);
+                if (storage != null && storage.canExtract())
                 {
-                    BlockPos pos = getPos().add(enumFacing.getDirectionVec());
-                    if (world.isBlockLoaded(pos))
+                    //Check how much can be drained
+                    int offer = storage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
+
+                    //Fill tile storage
+                    int taken = energyStorage.receiveEnergy(offer, false);
+
+                    //Drain battery
+                    storage.extractEnergy(taken, false);
+
+                    //Trigger inventory update
+                    inventory.setStackInSlot(SLOT_BATTERY_INPUT, batteryToDischarge);
+                }
+            }
+            else
+            {
+                EnergyModProxy.dischargeBattery(energyStorage, batteryToDischarge);
+            }
+        }
+    }
+
+    protected void chargeBattery()
+    {
+        ItemStack batteryToCharge = inventory.getStackInSlot(SLOT_BATTERY_OUTPUT);
+        if (!batteryToCharge.isEmpty())
+        {
+            if (batteryToCharge.hasCapability(CapabilityEnergy.ENERGY, null))
+            {
+                IEnergyStorage storage = batteryToCharge.getCapability(CapabilityEnergy.ENERGY, null);
+                if (storage != null && storage.canReceive())
+                {
+
+                    //Trigger inventory update
+                    inventory.setStackInSlot(SLOT_BATTERY_OUTPUT, batteryToCharge);
+                }
+            }
+            else
+            {
+                EnergyModProxy.chargeBattery(energyStorage, batteryToCharge);
+            }
+        }
+    }
+
+    protected void handlePowerTiles()
+    {
+        for (EnumFacing enumFacing : EnumFacing.VALUES)
+        {
+            if (getEnergySideWrapper(enumFacing).sideState == EnergySideState.OUTPUT)
+            {
+                BlockPos pos = getPos().add(enumFacing.getDirectionVec());
+                if (world.isBlockLoaded(pos))
+                {
+                    TileEntity tileEntity = world.getTileEntity(pos);
+                    if (tileEntity != null)
                     {
-                        TileEntity tileEntity = world.getTileEntity(pos);
-                        if (tileEntity != null)
+                        if (tileEntity.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
                         {
-                            if (tileEntity.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
+                            IEnergyStorage cap = tileEntity.getCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite());
+                            if (cap != null)
                             {
-                                IEnergyStorage cap = tileEntity.getCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite());
-                                if (cap != null)
-                                {
-                                    int give = energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
-                                    int taken = cap.receiveEnergy(give, false);
-                                    energyStorage.extractEnergy(taken, false);
-                                }
+                                int give = energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
+                                int taken = cap.receiveEnergy(give, false);
+                                energyStorage.extractEnergy(taken, false);
                             }
-                            else
-                            {
-                                givePower(tileEntity, enumFacing.getOpposite());
-                            }
+                        }
+                        else
+                        {
+                            EnergyModProxy.chargeTile(tileEntity, this, energyStorage, enumFacing.getOpposite());
                         }
                     }
                 }
             }
         }
-    }
-
-    private boolean givePower(TileEntity target, EnumFacing side)
-    {
-        for (ModProxy proxy : EnergyStorageBlockMod.modProxies)
-        {
-            if (proxy.outputPower(this, target, side))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     public EnergySideState toggleEnergySide(EnumFacing side)
@@ -178,7 +241,6 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         return energySideWrapper[facing.ordinal()];
     }
 
-
     //<editor-fold desc="ic2 power">
     @Override
     @Optional.Method(modid = "ic2")
@@ -261,13 +323,13 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     public void invalidate()
     {
         super.invalidate();
-        EnergyStorageBlockMod.modProxies.forEach(proxy -> proxy.onTileInvalidate(this));
+        EnergyStorageBlockMod.energyModProxies.forEach(proxy -> proxy.onTileInvalidate(this));
     }
 
     @Override
     public void validate()
     {
         super.validate();
-        EnergyStorageBlockMod.modProxies.forEach(proxy -> proxy.onTileValidate(this));
+        EnergyStorageBlockMod.energyModProxies.forEach(proxy -> proxy.onTileValidate(this));
     }
 }
