@@ -1,5 +1,6 @@
-package com.builtbroken.energystorageblock;
+package com.builtbroken.energystorageblock.client;
 
+import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;

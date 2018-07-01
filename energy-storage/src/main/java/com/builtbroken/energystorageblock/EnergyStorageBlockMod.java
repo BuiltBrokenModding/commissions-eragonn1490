@@ -5,12 +5,14 @@ import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.mods.EnergyModProxy;
 import com.builtbroken.energystorageblock.mods.buildcraft.BuildcraftProxy;
 import com.builtbroken.energystorageblock.mods.ic2.IC2Proxy;
+import com.builtbroken.energystorageblock.network.NetworkHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -39,10 +41,14 @@ public class EnergyStorageBlockMod
 
     public static List<EnergyModProxy> energyModProxies = new ArrayList();
 
+    @SidedProxy(clientSide = "com.builtbroken.energystorageblock.client.ClientProxy", serverSide = "com.builtbroken.energystorageblock.CommonProxy")
+    public static CommonProxy proxy;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+        NetworkHandler.init();
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, proxy);
 
         if (Loader.isModLoaded("ic2"))
         {
