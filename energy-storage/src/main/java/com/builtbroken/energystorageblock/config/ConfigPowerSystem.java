@@ -19,7 +19,7 @@ public class ConfigPowerSystem
     @Config.Name("from_buildcraft")
     @Config.Comment("How much (MJ) builcraft energy to turn into (FE) Forge energy")
     @Config.RangeInt(min = 0)
-    public static double FROM_BUILDCRAFT = 200D;
+    public static double FROM_BUILDCRAFT = 0.1D;
 
     @Config.Name("enable_ic2")
     @Config.Comment("Set to true to enable IC2 (EU) power support. Requires restart to take full effect.")

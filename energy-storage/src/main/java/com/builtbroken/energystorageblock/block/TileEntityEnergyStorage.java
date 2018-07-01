@@ -4,6 +4,8 @@ import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import com.builtbroken.energystorageblock.energy.EnergyBlockStorage;
+import com.builtbroken.energystorageblock.energy.EnergySideState;
+import com.builtbroken.energystorageblock.energy.EnergySideWrapper;
 import com.builtbroken.energystorageblock.mods.ModProxy;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
@@ -19,6 +21,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -31,35 +34,40 @@ import javax.annotation.Nullable;
 public class TileEntityEnergyStorage extends TileEntity implements ITickable, IEnergySink, IEnergySource
 {
     public static final String NBT_ENERGY = "energy";
+    public static final String NBT_ENERGY_SIDES = "energy_sides";
 
-    public final EnergyBlockStorage energyStorage = new EnergyBlockStorage();
+    private final EnergyBlockStorage energyStorage = new EnergyBlockStorage();
+    private EnergySideWrapper[] energySideWrapper = new EnergySideWrapper[6];
 
     @Override
     public void update()
     {
-        if (!world.isRemote)
+        if (!world.isRemote && energyStorage.getEnergyStored() > 0)
         {
             for (EnumFacing enumFacing : EnumFacing.VALUES)
             {
-                BlockPos pos = getPos().add(enumFacing.getDirectionVec());
-                if (world.isBlockLoaded(pos))
+                if (getEnergySideWrapper(enumFacing.getOpposite()).sideState == EnergySideState.OUTPUT)
                 {
-                    TileEntity tileEntity = world.getTileEntity(pos);
-                    if (tileEntity != null)
+                    BlockPos pos = getPos().add(enumFacing.getDirectionVec());
+                    if (world.isBlockLoaded(pos))
                     {
-                        if (tileEntity.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
+                        TileEntity tileEntity = world.getTileEntity(pos);
+                        if (tileEntity != null)
                         {
-                            IEnergyStorage cap = tileEntity.getCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite());
-                            if (cap != null)
+                            if (tileEntity.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
                             {
-                                int give = energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
-                                int taken = cap.receiveEnergy(give, false);
-                                energyStorage.extractEnergy(taken, false);
+                                IEnergyStorage cap = tileEntity.getCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite());
+                                if (cap != null)
+                                {
+                                    int give = energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
+                                    int taken = cap.receiveEnergy(give, false);
+                                    energyStorage.extractEnergy(taken, false);
+                                }
                             }
-                        }
-                        else
-                        {
-                            givePower(tileEntity, enumFacing.getOpposite());
+                            else
+                            {
+                                givePower(tileEntity, enumFacing.getOpposite());
+                            }
                         }
                     }
                 }
@@ -79,24 +87,70 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         return false;
     }
 
+    public EnergySideState toggleEnergySide(EnumFacing side)
+    {
+        EnergySideWrapper wrapper = getEnergySideWrapper(side);
+        wrapper.sideState.next();
+        return wrapper.sideState;
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
+
+        //Load energy
         energyStorage.setEnergy(compound.getInteger(NBT_ENERGY));
+
+        //Load side data
+        if (compound.hasKey(NBT_ENERGY_SIDES))
+        {
+            NBTTagCompound sideSave = compound.getCompoundTag(NBT_ENERGY_SIDES);
+            for (EnumFacing facing : EnumFacing.VALUES)
+            {
+                EnergySideWrapper wrapper = getEnergySideWrapper(facing);
+                byte i = sideSave.getByte(facing.getName());
+                if (i >= 0 && i < EnergySideState.values().length)
+                {
+                    wrapper.sideState = EnergySideState.values()[i];
+                }
+            }
+        }
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
+        //Save energy
         compound.setInteger(NBT_ENERGY, energyStorage.getEnergyStored());
+
+        //Save side data
+        NBTTagCompound sideSave = new NBTTagCompound();
+        for (EnumFacing facing : EnumFacing.VALUES)
+        {
+            EnergySideWrapper wrapper = energySideWrapper[facing.ordinal()];
+            if (wrapper != null)
+            {
+                sideSave.setByte(facing.name(), (byte) wrapper.sideState.ordinal());
+            }
+        }
+        compound.setTag(NBT_ENERGY_SIDES, sideSave);
+
         return super.writeToNBT(compound);
     }
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
     {
-        return capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
+        if (capability == CapabilityEnergy.ENERGY)
+        {
+            if (facing != null)
+            {
+                return getEnergySideWrapper(facing).sideState != EnergySideState.NONE;
+            }
+            return true;
+        }
+        return super.hasCapability(capability, facing);
     }
 
     @Override
@@ -105,10 +159,20 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     {
         if (capability == CapabilityEnergy.ENERGY)
         {
-            return (T) energyStorage;
+            return (T) (facing == null ? energyStorage : getEnergySideWrapper(facing));
         }
         return super.getCapability(capability, facing);
     }
+
+    private EnergySideWrapper getEnergySideWrapper(@Nonnull EnumFacing facing)
+    {
+        if (energySideWrapper[facing.ordinal()] == null)
+        {
+            energySideWrapper[facing.ordinal()] = new EnergySideWrapper(energyStorage);
+        }
+        return energySideWrapper[facing.ordinal()];
+    }
+
 
     //<editor-fold desc="ic2 power">
     @Override

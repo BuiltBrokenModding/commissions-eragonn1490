@@ -1,2 +1,24 @@
 tile.energystorageblock:energy.storage.name=Energy Storage Block
 tile.energystorageblock:energy.storage.info.power=Energy: %d / %d FE
+
+## Info keys for energy side set
+tile.energystorageblock:energy.storage.info.power.side.set.up.input=Side up set to input energy
+tile.energystorageblock:energy.storage.info.power.side.set.down.input=Side down set to input energy
+tile.energystorageblock:energy.storage.info.power.side.set.north.input=Side north set to input energy
+tile.energystorageblock:energy.storage.info.power.side.set.south.input=Side south set to input energy
+tile.energystorageblock:energy.storage.info.power.side.set.east.input=Side east set to input energy
+tile.energystorageblock:energy.storage.info.power.side.set.west.input=Side west set to input energy
+
+tile.energystorageblock:energy.storage.info.power.side.set.up.output=Side up set to output energy
+tile.energystorageblock:energy.storage.info.power.side.set.down.output=Side down set to output energy
+tile.energystorageblock:energy.storage.info.power.side.set.north.output=Side north set to output energy
+tile.energystorageblock:energy.storage.info.power.side.set.south.output=Side south set to output energy
+tile.energystorageblock:energy.storage.info.power.side.set.east.output=Side east set to output energy
+tile.energystorageblock:energy.storage.info.power.side.set.west.output=Side west set to output energy
+
+tile.energystorageblock:energy.storage.info.power.side.set.up.none=Side up disconnected
+tile.energystorageblock:energy.storage.info.power.side.set.down.none=Side down disconnected
+tile.energystorageblock:energy.storage.info.power.side.set.north.none=Side north disconnected
+tile.energystorageblock:energy.storage.info.power.side.set.south.none=Side south disconnected
+tile.energystorageblock:energy.storage.info.power.side.set.east.none=Side east disconnected
+tile.energystorageblock:energy.storage.info.power.side.set.west.none=Side west disconnected

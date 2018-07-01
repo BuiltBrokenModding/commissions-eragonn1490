@@ -15,11 +15,15 @@ public class EnergyBlockStorage implements IEnergyStorage
     public int receiveEnergy(int maxReceive, boolean simulate)
     {
         if (!canReceive())
+        {
             return 0;
+        }
 
         int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(ConfigEnergyStorage.INPUT_LIMIT, maxReceive));
         if (!simulate)
+        {
             energy += energyReceived;
+        }
         return energyReceived;
     }
 
@@ -27,11 +31,15 @@ public class EnergyBlockStorage implements IEnergyStorage
     public int extractEnergy(int maxExtract, boolean simulate)
     {
         if (!canExtract())
+        {
             return 0;
+        }
 
         int energyExtracted = Math.min(energy, Math.min(ConfigEnergyStorage.OUTPUT_LIMIT, maxExtract));
         if (!simulate)
+        {
             energy -= energyExtracted;
+        }
         return energyExtracted;
     }
 

@@ -10,6 +10,8 @@ import ic2.api.energy.tile.IEnergyTile;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
 /**
@@ -22,28 +24,35 @@ public class IC2Proxy extends ModProxy
 
     @Override
     @Optional.Method(modid = "ic2")
-    public boolean outputPower(TileEntityEnergyStorage energyStorage, TileEntity target, EnumFacing enumFacing)
+    public boolean outputPower(TileEntityEnergyStorage tile, TileEntity target, EnumFacing enumFacing)
     {
-        if (target instanceof IEnergySink && ((IEnergySink) target).acceptsEnergyFrom(null, enumFacing))
+        if (tile.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
         {
-            //Get demand and convert to FE power
-            double demand = ((IEnergySink) target).getDemandedEnergy();
-            int request = (int) Math.floor(demand * ConfigPowerSystem.FROM_IC2);
+            IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite());
+            if (energyStorage != null)
+            {
+                if (target instanceof IEnergySink && ((IEnergySink) target).acceptsEnergyFrom(null, enumFacing))
+                {
+                    //Get demand and convert to FE power
+                    double demand = ((IEnergySink) target).getDemandedEnergy();
+                    int request = (int) Math.floor(demand * ConfigPowerSystem.FROM_IC2);
 
-            //Check how much power we can remove
-            int give = energyStorage.energyStorage.extractEnergy(request, true);
+                    //Check how much power we can remove
+                    int give = energyStorage.extractEnergy(request, true);
 
-            //Convert give to IC2
-            double inject = give / ConfigPowerSystem.FROM_IC2;
+                    //Convert give to IC2
+                    double inject = give / ConfigPowerSystem.FROM_IC2;
 
-            //Inject energy
-            double leftOver = ((IEnergySink) target).injectEnergy(enumFacing, inject, 1);
+                    //Inject energy
+                    double leftOver = ((IEnergySink) target).injectEnergy(enumFacing, inject, 1);
 
-            //Remove energy from storage
-            inject -= leftOver;
-            int remove = (int) Math.ceil(inject * ConfigPowerSystem.FROM_IC2);
-            energyStorage.energyStorage.extractEnergy(remove, false);
-            return true;
+                    //Remove energy from storage
+                    inject -= leftOver;
+                    int remove = (int) Math.ceil(inject * ConfigPowerSystem.FROM_IC2);
+                    energyStorage.extractEnergy(remove, false);
+                    return true;
+                }
+            }
         }
         return false;
     }

@@ -3,6 +3,7 @@ package com.builtbroken.energystorageblock;
 import com.builtbroken.energystorageblock.block.BlockEnergyStorage;
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.mods.ModProxy;
+import com.builtbroken.energystorageblock.mods.buildcraft.BuildcraftProxy;
 import com.builtbroken.energystorageblock.mods.ic2.IC2Proxy;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -44,7 +45,10 @@ public class EnergyStorageBlockMod
         {
             modProxies.add(IC2Proxy.INSTANCE);
         }
-        //TODO add MJ proxy
+        if (Loader.isModLoaded("buildcraftenergy"))
+        {
+            modProxies.add(BuildcraftProxy.INSTANCE);
+        }
 
         modProxies.forEach(proxy -> proxy.preInit());
     }

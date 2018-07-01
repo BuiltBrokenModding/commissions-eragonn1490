@@ -1,6 +1,7 @@
 package com.builtbroken.energystorageblock.block;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
+import com.builtbroken.energystorageblock.energy.EnergySideState;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -14,6 +15,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 
@@ -37,15 +40,31 @@ public class BlockEnergyStorage extends Block implements ITileEntityProvider
         TileEntity tile = worldIn.getTileEntity(pos);
         if (tile instanceof TileEntityEnergyStorage)
         {
-            if (playerIn.getHeldItem(hand).getItem() == Items.STICK)
+            if (playerIn.getHeldItem(hand).getItem() == Items.STICK) //Could replace with wrench for side toggle
             {
                 if (!worldIn.isRemote)
                 {
-                    playerIn.sendMessage(new TextComponentTranslation(
-                            getUnlocalizedName() + ".info.power",
-                            ((TileEntityEnergyStorage) tile).energyStorage.getEnergyStored(),
-                            ((TileEntityEnergyStorage) tile).energyStorage.getMaxEnergyStored()));
-
+                    if (!playerIn.isSneaking())
+                    {
+                        //Debug, can remove if you want
+                        if (tile.hasCapability(CapabilityEnergy.ENERGY, null))
+                        {
+                            IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
+                            if (energyStorage != null)
+                            {
+                                playerIn.sendMessage(new TextComponentTranslation(
+                                        getUnlocalizedName() + ".info.power",
+                                        energyStorage.getEnergyStored(),
+                                        energyStorage.getMaxEnergyStored()));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        EnergySideState energySideState = ((TileEntityEnergyStorage) tile).toggleEnergySide(facing);
+                        playerIn.sendMessage(new TextComponentTranslation(
+                                getUnlocalizedName() + ".info.power.side.set." + facing.name() + "." + energySideState.name().toLowerCase()));
+                    }
                 }
                 return true;
             }
