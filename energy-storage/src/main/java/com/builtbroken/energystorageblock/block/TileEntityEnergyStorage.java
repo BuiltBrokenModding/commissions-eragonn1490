@@ -7,16 +7,23 @@ import com.builtbroken.energystorageblock.energy.EnergyBlockStorage;
 import com.builtbroken.energystorageblock.energy.EnergySideState;
 import com.builtbroken.energystorageblock.energy.EnergySideWrapper;
 import com.builtbroken.energystorageblock.mods.EnergyModProxy;
+import com.builtbroken.energystorageblock.network.IDescMessageTile;
+import com.builtbroken.energystorageblock.network.MessageDesc;
+import com.builtbroken.energystorageblock.network.MessageTileEnergy;
+import com.builtbroken.energystorageblock.network.NetworkHandler;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -33,7 +40,7 @@ import javax.annotation.Nullable;
 @Optional.InterfaceList({
         @Optional.Interface(iface = "ic2.api.energy.tile.IEnergySink", modid = "ic2")
 })
-public class TileEntityEnergyStorage extends TileEntity implements ITickable, IEnergySink, IEnergySource
+public class TileEntityEnergyStorage extends TileEntity implements ITickable, IEnergySink, IEnergySource, IDescMessageTile
 {
     //NBT keys
     public static final String NBT_ENERGY = "energy";
@@ -52,6 +59,9 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     //Side handler for input/output/disconnect state
     private EnergySideWrapper[] energySideWrapper = new EnergySideWrapper[6];
 
+    private int prevEnergy = -1;
+    private boolean sendDescPacket = false;
+
     @Override
     public void update()
     {
@@ -63,7 +73,25 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
             chargeBattery();
             //Last handle connected tiles
             handlePowerTiles();
+
+            if (sendDescPacket)
+            {
+                sendDescPacket = false;
+                prevEnergy = energyStorage.getEnergyStored();
+                MessageDesc.send(this);
+            }
+            else if (energyStorage.getEnergyStored() != prevEnergy)
+            {
+                prevEnergy = energyStorage.getEnergyStored();
+                NetworkHandler.sendToAllAround(this, new MessageTileEnergy(this, prevEnergy));
+            }
         }
+    }
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
+    {
+        return oldState.getBlock() != newSate.getBlock();
     }
 
     protected void dischargeBattery()
@@ -152,21 +180,65 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
 
     public EnergySideState toggleEnergySide(EnumFacing side)
     {
+        //update state
         EnergySideWrapper wrapper = getEnergySideWrapper(side);
         wrapper.sideState = wrapper.sideState.next();
+
+        //Next tick send packet
+        sendDescPacket = true;
+
+        //Mark so the block saves
         markDirty();
+
+        //Update blocks so wire connections change
         world.markAndNotifyBlock(pos,
                 world.getChunkFromBlockCoords(getPos()),
                 world.getBlockState(getPos()),
                 world.getBlockState(getPos()), 3);
+
+        //Return new state
         return wrapper.sideState;
+    }
+
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket()
+    {
+        return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
+    }
+
+    @Override
+    public NBTTagCompound getUpdateTag()
+    {
+        return writeData(new NBTTagCompound());
+    }
+
+    @Override
+    public NBTTagCompound writeDescMessage(NBTTagCompound tagCompound)
+    {
+        return writeData(tagCompound);
+    }
+
+    @Override
+    public void readDescMessage(NBTTagCompound tagCompound)
+    {
+        readData(tagCompound);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
+        readData(compound);
+    }
 
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    {
+        return writeData(super.writeToNBT(compound));
+    }
+
+    protected void readData(NBTTagCompound compound)
+    {
         //Load energy
         energyStorage.setEnergy(compound.getInteger(NBT_ENERGY));
 
@@ -186,8 +258,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         }
     }
 
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    protected NBTTagCompound writeData(NBTTagCompound compound)
     {
         //Save energy
         compound.setInteger(NBT_ENERGY, energyStorage.getEnergyStored());
@@ -204,8 +275,9 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         }
         compound.setTag(NBT_ENERGY_SIDES, sideSave);
 
-        return super.writeToNBT(compound);
+        return compound;
     }
+
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)

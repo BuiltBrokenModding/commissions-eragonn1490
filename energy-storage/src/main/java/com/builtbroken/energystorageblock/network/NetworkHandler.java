@@ -1,7 +1,9 @@
 package com.builtbroken.energystorageblock.network;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -17,5 +19,18 @@ public class NetworkHandler
     {
         NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(EnergyStorageBlockMod.DOMAIN);
         NETWORK.registerMessage(MessageTileEnergy.MessageHandler.class, MessageTileEnergy.class, 0, Side.CLIENT);
+        NETWORK.registerMessage(MessageDesc.MessageHandler.class, MessageDesc.class, 1, Side.CLIENT);
+    }
+
+    public static void sendToAllAround(TileEntity tileEntity, IMessage message)
+    {
+        NETWORK.sendToAllAround(message,
+                new NetworkRegistry.TargetPoint(
+                        tileEntity.getWorld().provider.getDimension(),
+                        tileEntity.getPos().getX(),
+                        tileEntity.getPos().getY(),
+                        tileEntity.getPos().getZ(),
+                        64
+                ));
     }
 }

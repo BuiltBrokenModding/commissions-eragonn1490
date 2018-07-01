@@ -1,6 +1,7 @@
 package com.builtbroken.energystorageblock.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
@@ -10,38 +11,35 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 public abstract class MessageTile implements IMessage
 {
     protected int dim;
-    protected int x;
-    protected int y;
-    protected int z;
+    protected BlockPos blockPos;
 
     public MessageTile()
     {
         //Empty for packet builder
     }
 
-    public MessageTile(int dim, int x, int y, int z)
+    public MessageTile(int dim, BlockPos blockPos)
     {
         this.dim = dim;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.blockPos = blockPos;
     }
 
     @Override
     public void fromBytes(ByteBuf buf)
     {
         dim = buf.readInt();
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
+        int x = buf.readInt();
+        int y = buf.readInt();
+        int z = buf.readInt();
+        blockPos = new BlockPos(x, y, z);
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
         buf.writeInt(dim);
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
+        buf.writeInt(blockPos.getX());
+        buf.writeInt(blockPos.getY());
+        buf.writeInt(blockPos.getZ());
     }
 }
