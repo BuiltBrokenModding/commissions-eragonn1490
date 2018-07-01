@@ -91,6 +91,11 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     {
         EnergySideWrapper wrapper = getEnergySideWrapper(side);
         wrapper.sideState = wrapper.sideState.next();
+        markDirty();
+        world.markAndNotifyBlock(pos,
+                world.getChunkFromBlockCoords(getPos()),
+                world.getBlockState(getPos()),
+                world.getBlockState(getPos()), 3);
         return wrapper.sideState;
     }
 
@@ -131,7 +136,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
             EnergySideWrapper wrapper = energySideWrapper[facing.ordinal()];
             if (wrapper != null)
             {
-                sideSave.setByte(facing.name(), (byte) wrapper.sideState.ordinal());
+                sideSave.setByte(facing.getName(), (byte) wrapper.sideState.ordinal());
             }
         }
         compound.setTag(NBT_ENERGY_SIDES, sideSave);
@@ -219,7 +224,12 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     @Optional.Method(modid = "ic2")
     public double getOfferedEnergy()
     {
-        return energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true) / ConfigPowerSystem.FROM_IC2;
+        if (ConfigPowerSystem.ENABLE_IC2)
+        {
+            int out = energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
+            return out / ConfigPowerSystem.FROM_IC2;
+        }
+        return 0;
     }
 
     @Override
@@ -241,7 +251,9 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     @Optional.Method(modid = "ic2")
     public boolean emitsEnergyTo(IEnergyAcceptor receiver, EnumFacing side)
     {
-        return ConfigPowerSystem.ENABLE_IC2 && hasCapability(CapabilityEnergy.ENERGY, side);
+        return ConfigPowerSystem.ENABLE_IC2
+                && hasCapability(CapabilityEnergy.ENERGY, side)
+                && getEnergySideWrapper(side).sideState == EnergySideState.OUTPUT;
     }
     //</editor-fold>
 
