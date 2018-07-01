@@ -32,7 +32,8 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)
             {
-                return (long) Math.floor(energyStorage.receiveEnergy(ConfigEnergyStorage.INPUT_LIMIT, true) / ConfigPowerSystem.FROM_BUILDCRAFT);
+                int energyNeeded = energyStorage.receiveEnergy(ConfigEnergyStorage.INPUT_LIMIT, true);
+                return (long) Math.floor(energyNeeded / ConfigPowerSystem.FROM_BUILDCRAFT);
             }
         }
         return 0;

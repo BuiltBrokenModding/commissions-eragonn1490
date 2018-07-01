@@ -1,6 +1,5 @@
 package com.builtbroken.energystorageblock.mods.buildcraft;
 
-import buildcraft.api.mj.IMjConnector;
 import buildcraft.api.mj.IMjReceiver;
 import buildcraft.api.mj.MjAPI;
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
@@ -12,7 +11,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -45,60 +43,40 @@ public class BuildcraftProxy extends ModProxy
     @Override
     public boolean outputPower(TileEntityEnergyStorage tile, TileEntity target, EnumFacing enumFacing)
     {
+        //Check that we support output for side
         if (tile.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
         {
-            IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite());
-            if (energyStorage != null)
+            //Check that target can receive energy
+            if (target.hasCapability(MjAPI.CAP_RECEIVER, enumFacing))
             {
-                if (canConnect(tile, target, enumFacing))
+                IMjReceiver receiver = target.getCapability(MjAPI.CAP_RECEIVER, enumFacing);
+                if (receiver != null && receiver.canReceive())
                 {
-                    if (target.hasCapability(MjAPI.CAP_RECEIVER, enumFacing))
+                    long request = receiver.getPowerRequested();
+                    if (request > 0)
                     {
-                        IMjReceiver receiver = target.getCapability(MjAPI.CAP_RECEIVER, enumFacing);
-                        if (receiver != null && receiver.canReceive())
+                        //Convert and check extract
+                        int energy = (int) Math.floor(request * ConfigPowerSystem.FROM_BUILDCRAFT);
+                        energy = tile.energyStorage.extractEnergy(energy, true);
+
+                        if (energy > 0)
                         {
-                            long request = receiver.getPowerRequested();
-                            if (request > 0)
-                            {
-                                //Convert and check extract
-                                int energy = (int) Math.floor(request * ConfigPowerSystem.FROM_BUILDCRAFT);
-                                energy = energyStorage.extractEnergy(energy, true);
+                            //Convert and insert
+                            long insert = (long) Math.floor(energy / ConfigPowerSystem.FROM_BUILDCRAFT);
+                            long leftOver = receiver.receivePower(insert, false);
 
-                                if (energy > 0)
-                                {
-                                    //Convert and insert
-                                    long insert = (long) Math.floor(energy / ConfigPowerSystem.FROM_BUILDCRAFT);
-                                    long leftOver = receiver.receivePower(insert, false);
+                            //Get energy taken
+                            long taken = insert - leftOver;
 
-                                    //Get energy taken
-                                    long taken = insert - leftOver;
-
-                                    //convert and remove energy
-                                    energy = (int) Math.ceil(taken * ConfigPowerSystem.FROM_BUILDCRAFT);
-                                    energyStorage.extractEnergy(energy, false);
-                                }
-                            }
-                            return true;
+                            //convert and remove energy
+                            energy = (int) Math.ceil(taken * ConfigPowerSystem.FROM_BUILDCRAFT);
+                            tile.energyStorage.extractEnergy(energy, false);
                         }
                     }
+                    return true;
                 }
             }
         }
         return false;
     }
-
-    private boolean canConnect(TileEntityEnergyStorage energyStorage, TileEntity target, EnumFacing enumFacing)
-    {
-        if (energyStorage.hasCapability(MjAPI.CAP_CONNECTOR, enumFacing))
-        {
-            IMjConnector sourceConnector = energyStorage.getCapability(MjAPI.CAP_CONNECTOR, enumFacing.getOpposite());
-            if (sourceConnector != null && target.hasCapability(MjAPI.CAP_CONNECTOR, enumFacing))
-            {
-                IMjConnector connector = target.getCapability(MjAPI.CAP_CONNECTOR, enumFacing);
-                return connector != null && connector.canConnect(sourceConnector);
-            }
-        }
-        return false;
-    }
-
 }

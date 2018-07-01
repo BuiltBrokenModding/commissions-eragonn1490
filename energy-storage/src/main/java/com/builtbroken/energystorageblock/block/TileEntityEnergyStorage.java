@@ -36,7 +36,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     public static final String NBT_ENERGY = "energy";
     public static final String NBT_ENERGY_SIDES = "energy_sides";
 
-    private final EnergyBlockStorage energyStorage = new EnergyBlockStorage();
+    public final EnergyBlockStorage energyStorage = new EnergyBlockStorage();
     private EnergySideWrapper[] energySideWrapper = new EnergySideWrapper[6];
 
     @Override
@@ -46,7 +46,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         {
             for (EnumFacing enumFacing : EnumFacing.VALUES)
             {
-                if (getEnergySideWrapper(enumFacing.getOpposite()).sideState == EnergySideState.OUTPUT)
+                if (getEnergySideWrapper(enumFacing).sideState == EnergySideState.OUTPUT)
                 {
                     BlockPos pos = getPos().add(enumFacing.getDirectionVec());
                     if (world.isBlockLoaded(pos))
@@ -90,7 +90,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     public EnergySideState toggleEnergySide(EnumFacing side)
     {
         EnergySideWrapper wrapper = getEnergySideWrapper(side);
-        wrapper.sideState.next();
+        wrapper.sideState = wrapper.sideState.next();
         return wrapper.sideState;
     }
 

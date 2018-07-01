@@ -40,31 +40,31 @@ public class BlockEnergyStorage extends Block implements ITileEntityProvider
         TileEntity tile = worldIn.getTileEntity(pos);
         if (tile instanceof TileEntityEnergyStorage)
         {
-            if (playerIn.getHeldItem(hand).getItem() == Items.STICK) //Could replace with wrench for side toggle
+            if (playerIn.getHeldItem(hand).getItem() == Items.STICK) //Debug, can remove if you want
             {
                 if (!worldIn.isRemote)
                 {
-                    if (!playerIn.isSneaking())
+                    if (tile.hasCapability(CapabilityEnergy.ENERGY, null))
                     {
-                        //Debug, can remove if you want
-                        if (tile.hasCapability(CapabilityEnergy.ENERGY, null))
+                        IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
+                        if (energyStorage != null)
                         {
-                            IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
-                            if (energyStorage != null)
-                            {
-                                playerIn.sendMessage(new TextComponentTranslation(
-                                        getUnlocalizedName() + ".info.power",
-                                        energyStorage.getEnergyStored(),
-                                        energyStorage.getMaxEnergyStored()));
-                            }
+                            playerIn.sendMessage(new TextComponentTranslation(
+                                    getUnlocalizedName() + ".info.power",
+                                    energyStorage.getEnergyStored(),
+                                    energyStorage.getMaxEnergyStored()));
                         }
                     }
-                    else
-                    {
-                        EnergySideState energySideState = ((TileEntityEnergyStorage) tile).toggleEnergySide(facing);
-                        playerIn.sendMessage(new TextComponentTranslation(
-                                getUnlocalizedName() + ".info.power.side.set." + facing.name() + "." + energySideState.name().toLowerCase()));
-                    }
+                }
+                return true;
+            }
+            else if (playerIn.getHeldItem(hand).getItem() == Items.BLAZE_ROD) //Could replace with wrench for side toggle
+            {
+                if (!worldIn.isRemote)
+                {
+                    EnergySideState energySideState = ((TileEntityEnergyStorage) tile).toggleEnergySide(facing);
+                    playerIn.sendMessage(new TextComponentTranslation(
+                            getUnlocalizedName() + ".info.power.side.set." + facing.getName() + "." + energySideState.name().toLowerCase()));
                 }
                 return true;
             }
