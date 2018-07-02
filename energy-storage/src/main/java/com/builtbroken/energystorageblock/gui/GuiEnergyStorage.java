@@ -14,10 +14,14 @@ import net.minecraft.util.ResourceLocation;
 public class GuiEnergyStorage extends GuiContainer
 {
     private static final ResourceLocation TEXTURE = new ResourceLocation(EnergyStorageBlockMod.DOMAIN, "textures/gui/energy.storage.png");
+    private static final String ENERGY_FORMAT = "%,d/%,d FE";
+
+    private final TileEntityEnergyStorage energyStorage;
 
     public GuiEnergyStorage(EntityPlayer player, TileEntityEnergyStorage energyStorage)
     {
         super(new ContainerEnergyStorage(player, energyStorage));
+        this.energyStorage = energyStorage;
     }
 
     @Override
@@ -31,7 +35,17 @@ public class GuiEnergyStorage extends GuiContainer
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.fontRenderer.drawString("Energy Storage Block", this.xSize / 2 - this.fontRenderer.getStringWidth("Energy Storage Block") / 2, 6, 4210752);
+        //Display title
+        final String title = "Energy Storage Block";
+        this.fontRenderer.drawString(title, this.xSize / 2 - this.fontRenderer.getStringWidth(title) / 2, 6, 4210752);
+
+        //Display energy
+        final String energy = String.format(ENERGY_FORMAT,
+                energyStorage.energyStorage.getEnergyStored(),
+                energyStorage.energyStorage.getMaxEnergyStored());
+        this.fontRenderer.drawString(energy, this.xSize / 2 - this.fontRenderer.getStringWidth(energy) / 2, 20, 4210752);
+
+        //Display inventory title
         this.fontRenderer.drawString("Inventory", 8, this.ySize - 96 + 2, 4210752);
     }
 

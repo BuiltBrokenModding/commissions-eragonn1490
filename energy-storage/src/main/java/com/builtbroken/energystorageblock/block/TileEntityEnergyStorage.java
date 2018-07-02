@@ -48,8 +48,8 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
 
     //Inventory constants
     public static final int INVENTORY_SIZE = 2;
-    public static final int SLOT_BATTERY_INPUT = 0;
-    public static final int SLOT_BATTERY_OUTPUT = 1;
+    public static final int SLOT_BATTERY_DISCHARGE = 0;
+    public static final int SLOT_BATTERY_CHARGE = 1;
 
     /** Main power storage */
     public final EnergyBlockStorage energyStorage = new EnergyBlockStorage(this);
@@ -96,7 +96,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
 
     protected void dischargeBattery()
     {
-        ItemStack batteryToDischarge = inventory.getStackInSlot(SLOT_BATTERY_INPUT);
+        ItemStack batteryToDischarge = inventory.getStackInSlot(SLOT_BATTERY_DISCHARGE);
         if (!batteryToDischarge.isEmpty())
         {
             if (batteryToDischarge.hasCapability(CapabilityEnergy.ENERGY, null))
@@ -114,7 +114,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
                     storage.extractEnergy(taken, false);
 
                     //Trigger inventory update
-                    inventory.setStackInSlot(SLOT_BATTERY_INPUT, batteryToDischarge);
+                    inventory.setStackInSlot(SLOT_BATTERY_DISCHARGE, batteryToDischarge);
                 }
             }
             else
@@ -126,7 +126,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
 
     protected void chargeBattery()
     {
-        ItemStack batteryToCharge = inventory.getStackInSlot(SLOT_BATTERY_OUTPUT);
+        ItemStack batteryToCharge = inventory.getStackInSlot(SLOT_BATTERY_CHARGE);
         if (!batteryToCharge.isEmpty())
         {
             if (batteryToCharge.hasCapability(CapabilityEnergy.ENERGY, null))
@@ -136,7 +136,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
                 {
 
                     //Trigger inventory update
-                    inventory.setStackInSlot(SLOT_BATTERY_OUTPUT, batteryToCharge);
+                    inventory.setStackInSlot(SLOT_BATTERY_CHARGE, batteryToCharge);
                 }
             }
             else

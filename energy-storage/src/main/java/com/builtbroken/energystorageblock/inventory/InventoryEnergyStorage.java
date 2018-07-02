@@ -25,7 +25,7 @@ public class InventoryEnergyStorage extends ItemStackHandler
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
     {
-        if (slot == TileEntityEnergyStorage.SLOT_BATTERY_OUTPUT || slot == TileEntityEnergyStorage.SLOT_BATTERY_INPUT)
+        if (slot == TileEntityEnergyStorage.SLOT_BATTERY_CHARGE || slot == TileEntityEnergyStorage.SLOT_BATTERY_DISCHARGE)
         {
             if (isBattery(stack))
             {
