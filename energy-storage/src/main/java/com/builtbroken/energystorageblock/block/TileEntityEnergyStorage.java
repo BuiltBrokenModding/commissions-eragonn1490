@@ -124,7 +124,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
             }
             else
             {
-                EnergyModProxy.dischargeBattery(energyStorage, batteryToDischarge);
+                EnergyModProxy.dischargeBattery(energyStorage, ConfigEnergyStorage.INPUT_LIMIT, batteryToDischarge);
             }
         }
     }
@@ -154,7 +154,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
             }
             else
             {
-                EnergyModProxy.chargeBattery(energyStorage, batteryToCharge);
+                EnergyModProxy.chargeBattery(energyStorage, ConfigEnergyStorage.OUTPUT_LIMIT, batteryToCharge);
             }
         }
     }

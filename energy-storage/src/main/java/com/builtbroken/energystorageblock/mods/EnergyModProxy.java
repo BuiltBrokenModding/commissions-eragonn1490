@@ -34,11 +34,11 @@ public class EnergyModProxy
      * @param stack         - battery to add power to
      * @return true if one of the proxies handled the battery
      */
-    public static boolean chargeBattery(IEnergyStorage energyStorage, ItemStack stack)
+    public static boolean chargeBattery(IEnergyStorage energyStorage, int limit, ItemStack stack)
     {
         for (EnergyModProxy proxy : EnergyStorageBlockMod.energyModProxies)
         {
-            if (proxy.handleBatteryCharge(energyStorage, stack))
+            if (proxy.handleBatteryCharge(energyStorage, limit, stack))
             {
                 return true;
             }
@@ -55,11 +55,11 @@ public class EnergyModProxy
      * @param stack         - battery to drain
      * @return true if one of the proxies handled the battery
      */
-    public static boolean dischargeBattery(IEnergyStorage energyStorage, ItemStack stack)
+    public static boolean dischargeBattery(IEnergyStorage energyStorage, int limit, ItemStack stack)
     {
         for (EnergyModProxy proxy : EnergyStorageBlockMod.energyModProxies)
         {
-            if (proxy.handleBatteryDischarge(energyStorage, stack))
+            if (proxy.handleBatteryDischarge(energyStorage, limit, stack))
             {
                 return true;
             }
@@ -103,7 +103,7 @@ public class EnergyModProxy
      * @param stack         - battery stack to fill
      * @return true if this proxy can handle or gave power to the battery
      */
-    protected boolean handleBatteryCharge(IEnergyStorage energyStorage, ItemStack stack)
+    protected boolean handleBatteryCharge(IEnergyStorage energyStorage, int limit, ItemStack stack)
     {
         return false;
     }
@@ -115,7 +115,7 @@ public class EnergyModProxy
      * @param stack         - battery stack to drain
      * @return true if this proxy can handle or took power from the stack
      */
-    protected boolean handleBatteryDischarge(IEnergyStorage energyStorage, ItemStack stack)
+    protected boolean handleBatteryDischarge(IEnergyStorage energyStorage, int limit, ItemStack stack)
     {
         return false;
     }

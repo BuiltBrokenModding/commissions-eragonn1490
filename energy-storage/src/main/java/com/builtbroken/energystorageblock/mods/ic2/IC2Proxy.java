@@ -6,6 +6,9 @@ import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergyTile;
+import ic2.api.item.ElectricItem;
+import ic2.api.item.IElectricItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.MinecraftForge;
@@ -48,6 +51,61 @@ public class IC2Proxy extends EnergyModProxy
                 energyStorage.extractEnergy(remove, false);
                 return true;
             }
+        }
+        return false;
+    }
+
+    @Override
+    protected boolean handleBatteryCharge(IEnergyStorage energyStorage, int limit, ItemStack stack)
+    {
+        if (stack.getItem() instanceof IElectricItem)
+        {
+            //Get energy to offer
+            int offer = energyStorage.extractEnergy(limit, true);
+
+            if (offer > 0)
+            {
+                //Convert to IC2 power
+                double insert = offer / ConfigPowerSystem.FROM_IC2;
+
+                //Give energy
+                int tier = ((IElectricItem) stack.getItem()).getTier(stack);
+                double taken = ElectricItem.manager.charge(stack, insert, tier, false, false);
+
+                //Drain energy from storage
+                int energy = (int) Math.ceil(taken * ConfigPowerSystem.FROM_IC2);
+                energyStorage.extractEnergy(energy, false);
+            }
+
+            return true;
+
+        }
+        return false;
+    }
+
+    @Override
+    protected boolean handleBatteryDischarge(IEnergyStorage energyStorage, int limit, ItemStack stack)
+    {
+        if (stack.getItem() instanceof IElectricItem)
+        {
+            //Calculate drain from battery
+            double drain = limit / ConfigPowerSystem.FROM_IC2;
+            int tier = ((IElectricItem) stack.getItem()).getTier(stack);
+            drain = ElectricItem.manager.discharge(stack, drain, tier, false, true, true);
+
+            //Calculate how much we can insert into tile
+            int input = (int) Math.ceil(drain * ConfigPowerSystem.FROM_IC2);
+            input = energyStorage.receiveEnergy(input, true);
+
+            //Drain battery
+            drain = input / ConfigPowerSystem.FROM_IC2;
+            drain = ElectricItem.manager.discharge(stack, drain, tier, false, true, false);
+
+            //Insert into tile
+            input = (int) Math.ceil(drain * ConfigPowerSystem.FROM_IC2);
+            energyStorage.receiveEnergy(input, false);
+
+            return true;
         }
         return false;
     }
