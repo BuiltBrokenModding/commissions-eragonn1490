@@ -13,6 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
@@ -25,12 +26,14 @@ public class BuildcraftProxy extends EnergyModProxy
     public static final BuildcraftProxy INSTANCE = new BuildcraftProxy();
 
     @Override
+    @Optional.Method(modid = "buildcraftenergy")
     public void preInit()
     {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
+    @Optional.Method(modid = "buildcraftenergy")
     public void attachCapabilityItem(AttachCapabilitiesEvent<TileEntity> event)
     {
         if (event.getObject() instanceof TileEntityEnergyStorage)
@@ -42,6 +45,7 @@ public class BuildcraftProxy extends EnergyModProxy
     }
 
     @Override
+    @Optional.Method(modid = "buildcraftenergy")
     public boolean outputPower(TileEntity target, TileEntity source, IEnergyStorage energyStorage, EnumFacing enumFacing)
     {
         //Check that we support output for side

@@ -56,6 +56,7 @@ public class IC2Proxy extends EnergyModProxy
     }
 
     @Override
+    @Optional.Method(modid = "ic2")
     protected boolean handleBatteryCharge(IEnergyStorage energyStorage, int limit, ItemStack stack)
     {
         if (stack.getItem() instanceof IElectricItem)
@@ -84,6 +85,7 @@ public class IC2Proxy extends EnergyModProxy
     }
 
     @Override
+    @Optional.Method(modid = "ic2")
     protected boolean handleBatteryDischarge(IEnergyStorage energyStorage, int limit, ItemStack stack)
     {
         if (stack.getItem() instanceof IElectricItem)
