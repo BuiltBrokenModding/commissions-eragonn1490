@@ -1,9 +1,11 @@
 package com.builtbroken.energystorageblock.gui;
 
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.inventory.InventoryEnergyStorage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 /**
@@ -39,5 +41,78 @@ public class ContainerEnergyStorage extends Container
     public boolean canInteractWith(EntityPlayer playerIn)
     {
         return playerIn.getDistanceSqToCenter(energyStorage.getPos()) <= 100;
+    }
+
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    {
+        final int invStart = 0;
+        final int invEnd = 2;
+
+        final int playerStart = 2;
+        final int playerHotbar = 29;
+        final int playerEnd = 38;
+
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+
+        if (slot != null && slot.getHasStack())
+        {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+
+            if (index < invEnd)
+            {
+                if (!this.mergeItemStack(itemstack1, playerStart, playerEnd, true))
+                {
+                    return ItemStack.EMPTY;
+                }
+
+                slot.onSlotChange(itemstack1, itemstack);
+            }
+            else if (index >= playerStart)
+            {
+                if (InventoryEnergyStorage.isBattery(itemstack1))
+                {
+                    if (!this.mergeItemStack(itemstack1, invStart, invEnd, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                else if (index >= playerStart && index < playerHotbar)
+                {
+                    if (!this.mergeItemStack(itemstack1, playerHotbar, playerEnd, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                else if (index >= playerHotbar && index < playerEnd && !this.mergeItemStack(itemstack1, playerStart, playerHotbar, false))
+                {
+                    return ItemStack.EMPTY;
+                }
+            }
+            else if (!this.mergeItemStack(itemstack1, playerStart, playerEnd, false))
+            {
+                return ItemStack.EMPTY;
+            }
+
+            if (itemstack1.isEmpty())
+            {
+                slot.putStack(ItemStack.EMPTY);
+            }
+            else
+            {
+                slot.onSlotChanged();
+            }
+
+            if (itemstack1.getCount() == itemstack.getCount())
+            {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(playerIn, itemstack1);
+        }
+
+        return itemstack;
     }
 }

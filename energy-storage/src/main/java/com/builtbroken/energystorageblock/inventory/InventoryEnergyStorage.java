@@ -42,7 +42,7 @@ public class InventoryEnergyStorage extends ItemStackHandler
      * @param stack - stack
      * @return true if battery
      */
-    protected boolean isBattery(@Nonnull ItemStack stack)
+    public static boolean isBattery(@Nonnull ItemStack stack)
     {
         return stack.hasCapability(CapabilityEnergy.ENERGY, null)
                 || EnergyStorageBlockMod.energyModProxies.stream().anyMatch(proxy -> proxy.isBattery(stack));
