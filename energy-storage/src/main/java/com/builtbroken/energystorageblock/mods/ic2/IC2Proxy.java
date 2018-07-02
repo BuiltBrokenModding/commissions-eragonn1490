@@ -61,6 +61,8 @@ public class IC2Proxy extends EnergyModProxy
     {
         if (stack.getItem() instanceof IElectricItem)
         {
+            int tier = ((IElectricItem) stack.getItem()).getTier(stack);
+
             //Get energy to offer
             int offer = energyStorage.extractEnergy(limit, true);
 
@@ -70,7 +72,6 @@ public class IC2Proxy extends EnergyModProxy
                 double insert = offer / ConfigPowerSystem.FROM_IC2;
 
                 //Give energy
-                int tier = ((IElectricItem) stack.getItem()).getTier(stack);
                 double taken = ElectricItem.manager.charge(stack, insert, tier, false, false);
 
                 //Drain energy from storage
@@ -90,22 +91,26 @@ public class IC2Proxy extends EnergyModProxy
     {
         if (stack.getItem() instanceof IElectricItem)
         {
-            //Calculate drain from battery
-            double drain = limit / ConfigPowerSystem.FROM_IC2;
             int tier = ((IElectricItem) stack.getItem()).getTier(stack);
+
+            //Calculate max drain from battery
+            double drain = limit / ConfigPowerSystem.FROM_IC2;
             drain = ElectricItem.manager.discharge(stack, drain, tier, false, true, true);
 
-            //Calculate how much we can insert into tile
-            int input = (int) Math.ceil(drain * ConfigPowerSystem.FROM_IC2);
+            //Calculate max insert into tile
+            int input = (int) Math.floor(drain * ConfigPowerSystem.FROM_IC2);
             input = energyStorage.receiveEnergy(input, true);
 
-            //Drain battery
-            drain = input / ConfigPowerSystem.FROM_IC2;
-            drain = ElectricItem.manager.discharge(stack, drain, tier, false, true, false);
+            if (input > 0)
+            {
+                //Drain battery
+                drain = input / ConfigPowerSystem.FROM_IC2;
+                drain = ElectricItem.manager.discharge(stack, drain, tier, false, true, false);
 
-            //Insert into tile
-            input = (int) Math.ceil(drain * ConfigPowerSystem.FROM_IC2);
-            energyStorage.receiveEnergy(input, false);
+                //Insert into tile
+                input = (int) Math.floor(drain * ConfigPowerSystem.FROM_IC2);
+                energyStorage.receiveEnergy(input, false);
+            }
 
             return true;
         }
