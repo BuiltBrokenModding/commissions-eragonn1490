@@ -49,6 +49,16 @@ public class InventoryEnergyStorage extends ItemStackHandler
     }
 
     @Override
+    public int getSlotLimit(int slot)
+    {
+        if (slot == TileEntityEnergyStorage.SLOT_BATTERY_CHARGE || slot == TileEntityEnergyStorage.SLOT_BATTERY_DISCHARGE)
+        {
+            return 1;
+        }
+        return 64;
+    }
+
+    @Override
     protected void onContentsChanged(int slot)
     {
         //Mark the tile has changed so it saves

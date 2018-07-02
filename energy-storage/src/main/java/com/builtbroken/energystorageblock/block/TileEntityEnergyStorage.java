@@ -119,7 +119,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     protected void dischargeBattery()
     {
         ItemStack batteryToDischarge = inventory.getStackInSlot(SLOT_BATTERY_DISCHARGE);
-        if (!batteryToDischarge.isEmpty())
+        if (!batteryToDischarge.isEmpty() && batteryToDischarge.getCount() == 1)
         {
             if (batteryToDischarge.hasCapability(CapabilityEnergy.ENERGY, null))
             {
@@ -149,7 +149,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     protected void chargeBattery()
     {
         ItemStack batteryToCharge = inventory.getStackInSlot(SLOT_BATTERY_CHARGE);
-        if (!batteryToCharge.isEmpty())
+        if (!batteryToCharge.isEmpty() && batteryToCharge.getCount() == 1)
         {
             if (batteryToCharge.hasCapability(CapabilityEnergy.ENERGY, null))
             {
