@@ -390,7 +390,9 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     @Optional.Method(modid = "ic2")
     public boolean acceptsEnergyFrom(IEnergyEmitter emitter, EnumFacing side)
     {
-        return ConfigPowerSystem.ENABLE_IC2 && hasCapability(CapabilityEnergy.ENERGY, side);
+        return ConfigPowerSystem.ENABLE_IC2
+                && hasCapability(CapabilityEnergy.ENERGY, side)
+                && getEnergySideWrapper(side).sideState == EnergySideState.INPUT;
     }
 
 
