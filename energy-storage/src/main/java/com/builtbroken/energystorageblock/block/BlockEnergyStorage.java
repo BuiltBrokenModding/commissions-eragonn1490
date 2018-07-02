@@ -7,7 +7,6 @@ import com.builtbroken.energystorageblock.energy.PropertyEnergySideState;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -31,19 +30,24 @@ import javax.annotation.Nullable;
  */
 public class BlockEnergyStorage extends Block implements ITileEntityProvider
 {
-    public static PropertyEnum<EnergySideState>[] side_state_props = new PropertyEnum[6];
+    public static PropertyEnergySideState[] side_state_props = new PropertyEnergySideState[6];
 
     static
     {
         for (EnumFacing facing : EnumFacing.VALUES)
         {
-            side_state_props[facing.ordinal()] = new PropertyEnergySideState("ess_" + facing.getName());
+            side_state_props[facing.ordinal()] = new PropertyEnergySideState(facing.getName());
         }
     }
 
     public BlockEnergyStorage()
     {
         super(Material.IRON);
+        setDefaultState(getDefaultState());
+        for (EnumFacing facing : EnumFacing.VALUES)
+        {
+            setDefaultState(getDefaultState().withProperty(side_state_props[facing.ordinal()], EnergySideState.NONE));
+        }
         setRegistryName(EnergyStorageBlockMod.DOMAIN, "energy_storage");
         setUnlocalizedName(EnergyStorageBlockMod.PREFIX + "energy.storage");
         setCreativeTab(CreativeTabs.REDSTONE);

@@ -7,12 +7,13 @@
     }
   },
   "variants": {
-    "inventory": {
-      "textures": {
-        "all": "energystorageblock:blocks/energy_storage_none"
-      }
-    },
-    "ess_up": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ],
+    "up": {
       "input": {
         "textures": {
           "up": "energystorageblock:blocks/energy_storage_input"
@@ -29,7 +30,7 @@
         }
       }
     },
-    "ess_down": {
+    "down": {
       "input": {
         "textures": {
           "down": "energystorageblock:blocks/energy_storage_input"
@@ -46,7 +47,7 @@
         }
       }
     },
-    "ess_north": {
+    "north": {
       "input": {
         "textures": {
           "north": "energystorageblock:blocks/energy_storage_input"
@@ -63,7 +64,7 @@
         }
       }
     },
-    "ess_south": {
+    "south": {
       "input": {
         "textures": {
           "south": "energystorageblock:blocks/energy_storage_input"
@@ -80,7 +81,7 @@
         }
       }
     },
-    "ess_east": {
+    "east": {
       "input": {
         "textures": {
           "east": "energystorageblock:blocks/energy_storage_input"
@@ -97,7 +98,7 @@
         }
       }
     },
-    "ess_west": {
+    "west": {
       "input": {
         "textures": {
           "west": "energystorageblock:blocks/energy_storage_input"
