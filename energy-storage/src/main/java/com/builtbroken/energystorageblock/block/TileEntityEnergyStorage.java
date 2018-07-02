@@ -70,7 +70,8 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
             //Pull power in first
             dischargeBattery();
 
-            if(energyStorage.getEnergyStored() > 0)
+            //Only move power if we have power to move
+            if (energyStorage.getEnergyStored() > 0)
             {
                 //Output to charge item, second to allow users to charge items
                 chargeBattery();
@@ -117,7 +118,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
                     //Drain battery
                     storage.extractEnergy(taken, false);
 
-                    //Trigger inventory update
+                    //Trigger inventory update, without saving may fail
                     inventory.setStackInSlot(SLOT_BATTERY_DISCHARGE, batteryToDischarge);
                 }
             }
@@ -147,7 +148,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
                     //Charge battery
                     storage.receiveEnergy(drained, false);
 
-                    //Trigger inventory update
+                    //Trigger inventory update, without saving may fail
                     inventory.setStackInSlot(SLOT_BATTERY_CHARGE, batteryToCharge);
                 }
             }
@@ -316,7 +317,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         return super.getCapability(capability, facing);
     }
 
-    private EnergySideWrapper getEnergySideWrapper(@Nonnull EnumFacing facing)
+    public EnergySideWrapper getEnergySideWrapper(@Nonnull EnumFacing facing)
     {
         if (energySideWrapper[facing.ordinal()] == null)
         {

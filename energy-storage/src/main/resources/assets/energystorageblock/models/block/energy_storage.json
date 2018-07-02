@@ -1,6 +1,0 @@
-{
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "energystorageblock:blocks/energy_storage"
-    }
-}
