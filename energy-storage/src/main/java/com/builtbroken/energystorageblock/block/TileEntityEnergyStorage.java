@@ -65,14 +65,18 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     @Override
     public void update()
     {
-        if (!world.isRemote && energyStorage.getEnergyStored() > 0)
+        if (!world.isRemote)
         {
             //Pull power in first
             dischargeBattery();
-            //Output to charge item, second to allow users to charge items
-            chargeBattery();
-            //Last handle connected tiles
-            handlePowerTiles();
+
+            if(energyStorage.getEnergyStored() > 0)
+            {
+                //Output to charge item, second to allow users to charge items
+                chargeBattery();
+                //Last handle connected tiles
+                handlePowerTiles();
+            }
 
             if (sendDescPacket)
             {
@@ -105,7 +109,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
                 if (storage != null && storage.canExtract())
                 {
                     //Check how much can be drained
-                    int offer = storage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
+                    int offer = storage.extractEnergy(ConfigEnergyStorage.INPUT_LIMIT, true);
 
                     //Fill tile storage
                     int taken = energyStorage.receiveEnergy(offer, false);
@@ -134,6 +138,14 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
                 IEnergyStorage storage = batteryToCharge.getCapability(CapabilityEnergy.ENERGY, null);
                 if (storage != null && storage.canReceive())
                 {
+                    //Check how much can be inserted
+                    int request = storage.receiveEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
+
+                    //Drain power from tile
+                    int drained = energyStorage.extractEnergy(request, false);
+
+                    //Charge battery
+                    storage.receiveEnergy(drained, false);
 
                     //Trigger inventory update
                     inventory.setStackInSlot(SLOT_BATTERY_CHARGE, batteryToCharge);
