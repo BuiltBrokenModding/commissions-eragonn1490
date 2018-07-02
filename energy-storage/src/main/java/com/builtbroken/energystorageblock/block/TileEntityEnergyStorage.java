@@ -18,6 +18,7 @@ import ic2.api.energy.tile.IEnergySource;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -28,6 +29,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -45,6 +48,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     //NBT keys
     public static final String NBT_ENERGY = "energy";
     public static final String NBT_ENERGY_SIDES = "energy_sides";
+    public static final String NBT_INVENTORY = "inventory";
 
     //Inventory constants
     public static final int INVENTORY_SIZE = 2;
@@ -61,6 +65,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
 
     private int prevEnergy = -1;
     private boolean sendDescPacket = false;
+    private boolean markForRender = true;
 
     @Override
     public void update()
@@ -90,6 +95,18 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
                 prevEnergy = energyStorage.getEnergyStored();
                 NetworkHandler.sendToAllAround(this, new MessageTileEnergy(this, prevEnergy));
             }
+        }
+        else if (markForRender)
+        {
+            markForRender = false;
+
+            markDirty();
+
+            //Update blocks so render changes
+            world.markAndNotifyBlock(pos,
+                    world.getChunkFromBlockCoords(getPos()),
+                    world.getBlockState(getPos()),
+                    world.getBlockState(getPos()), 3);
         }
     }
 
@@ -222,7 +239,14 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     @Override
     public NBTTagCompound getUpdateTag()
     {
-        return writeData(new NBTTagCompound());
+        return writeToNBT(new NBTTagCompound());
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
+    {
+        readFromNBT(pkt.getNbtCompound());
     }
 
     @Override
@@ -235,18 +259,21 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     public void readDescMessage(NBTTagCompound tagCompound)
     {
         readData(tagCompound);
+        markForRender = true;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
         super.readFromNBT(compound);
+        inventory.deserializeNBT(compound.getCompoundTag(NBT_INVENTORY));
         readData(compound);
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
+        compound.setTag(NBT_INVENTORY, inventory.serializeNBT());
         return writeData(super.writeToNBT(compound));
     }
 
