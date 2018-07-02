@@ -208,6 +208,16 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         }
     }
 
+    public boolean canOutputEnergySide(EnumFacing side)
+    {
+        return getEnergySideWrapper(side).sideState == EnergySideState.OUTPUT;
+    }
+
+    public boolean canInputEnergySide(EnumFacing side)
+    {
+        return getEnergySideWrapper(side).sideState == EnergySideState.INPUT;
+    }
+
     public EnergySideState toggleEnergySide(EnumFacing side)
     {
         //update state
@@ -392,7 +402,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     {
         return ConfigPowerSystem.ENABLE_IC2
                 && hasCapability(CapabilityEnergy.ENERGY, side)
-                && getEnergySideWrapper(side).sideState == EnergySideState.INPUT;
+                && canInputEnergySide(side);
     }
 
 
@@ -429,7 +439,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     {
         return ConfigPowerSystem.ENABLE_IC2
                 && hasCapability(CapabilityEnergy.ENERGY, side)
-                && getEnergySideWrapper(side).sideState == EnergySideState.OUTPUT;
+                && canOutputEnergySide(side);
     }
     //</editor-fold>
 

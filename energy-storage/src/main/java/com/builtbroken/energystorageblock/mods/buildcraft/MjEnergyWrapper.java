@@ -6,6 +6,7 @@ import buildcraft.api.mj.IMjReceiver;
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -18,16 +19,18 @@ import javax.annotation.Nonnull;
 public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
 {
     private final TileEntityEnergyStorage tile;
+    private final EnumFacing side;
 
-    public MjEnergyWrapper(TileEntityEnergyStorage tile)
+    public MjEnergyWrapper(TileEntityEnergyStorage tile, EnumFacing side)
     {
         this.tile = tile;
+        this.side = side;
     }
 
     @Override
     public long getPowerRequested()
     {
-        if (tile.hasCapability(CapabilityEnergy.ENERGY, null))
+        if (tile.canInputEnergySide(side))
         {
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)
@@ -42,7 +45,7 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
     @Override
     public long receivePower(long microJoules, boolean simulate)
     {
-        if (tile.hasCapability(CapabilityEnergy.ENERGY, null))
+        if (tile.canInputEnergySide(side))
         {
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)
@@ -72,7 +75,7 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
     @Override
     public long extractPower(long min, long max, boolean simulate)
     {
-        if (tile.hasCapability(CapabilityEnergy.ENERGY, null))
+        if (tile.canOutputEnergySide(side))
         {
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)

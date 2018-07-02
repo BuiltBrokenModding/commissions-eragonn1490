@@ -42,7 +42,7 @@ public class MjCapabilityProvider implements ICapabilityProvider
         {
             if (wrappers[facing.ordinal()] == null)
             {
-                wrappers[facing.ordinal()] = new MjEnergyWrapper(tile);
+                wrappers[facing.ordinal()] = new MjEnergyWrapper(tile, facing);
             }
             return (T) wrappers[facing.ordinal()];
         }
