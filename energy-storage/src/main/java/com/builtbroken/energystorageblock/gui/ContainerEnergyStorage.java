@@ -17,8 +17,8 @@ public class ContainerEnergyStorage extends Container
     public ContainerEnergyStorage(EntityPlayer player, TileEntityEnergyStorage energyStorage)
     {
         this.energyStorage = energyStorage;
-        this.addSlotToContainer(new SlotItemHandler(energyStorage.inventory, TileEntityEnergyStorage.SLOT_BATTERY_DISCHARGE, 44, 37));
-        this.addSlotToContainer(new SlotItemHandler(energyStorage.inventory, TileEntityEnergyStorage.SLOT_BATTERY_CHARGE, 116, 37));
+        this.addSlotToContainer(new SlotItemHandler(energyStorage.inventory, TileEntityEnergyStorage.SLOT_BATTERY_DISCHARGE, 26, 37));
+        this.addSlotToContainer(new SlotItemHandler(energyStorage.inventory, TileEntityEnergyStorage.SLOT_BATTERY_CHARGE, 134, 37));
 
         //Add player inventory
         for (int i = 0; i < 3; ++i)
