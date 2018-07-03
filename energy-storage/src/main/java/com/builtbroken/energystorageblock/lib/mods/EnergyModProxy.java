@@ -1,4 +1,4 @@
-package com.builtbroken.energystorageblock.mods;
+package com.builtbroken.energystorageblock.lib.mods;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import net.minecraft.item.ItemStack;

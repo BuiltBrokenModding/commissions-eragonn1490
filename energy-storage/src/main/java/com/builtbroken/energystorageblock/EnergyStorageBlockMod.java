@@ -1,11 +1,11 @@
 package com.builtbroken.energystorageblock;
 
-import com.builtbroken.energystorageblock.block.BlockEnergyStorage;
-import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
-import com.builtbroken.energystorageblock.mods.EnergyModProxy;
-import com.builtbroken.energystorageblock.mods.buildcraft.BuildcraftProxy;
-import com.builtbroken.energystorageblock.mods.ic2.IC2Proxy;
-import com.builtbroken.energystorageblock.network.NetworkHandler;
+import com.builtbroken.energystorageblock.content.cube.BlockEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
+import com.builtbroken.energystorageblock.lib.mods.buildcraft.BuildcraftProxy;
+import com.builtbroken.energystorageblock.lib.mods.ic2.IC2Proxy;
+import com.builtbroken.energystorageblock.lib.network.NetworkHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;

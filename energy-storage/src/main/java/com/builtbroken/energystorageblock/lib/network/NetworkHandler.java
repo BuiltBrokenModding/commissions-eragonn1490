@@ -1,4 +1,4 @@
-package com.builtbroken.energystorageblock.network;
+package com.builtbroken.energystorageblock.lib.network;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import net.minecraft.tileentity.TileEntity;

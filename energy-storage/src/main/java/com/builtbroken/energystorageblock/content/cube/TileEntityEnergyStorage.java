@@ -1,16 +1,16 @@
-package com.builtbroken.energystorageblock.block;
+package com.builtbroken.energystorageblock.content.cube;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
-import com.builtbroken.energystorageblock.energy.EnergyBlockStorage;
-import com.builtbroken.energystorageblock.energy.EnergySideState;
-import com.builtbroken.energystorageblock.energy.EnergySideWrapper;
-import com.builtbroken.energystorageblock.mods.EnergyModProxy;
-import com.builtbroken.energystorageblock.network.IDescMessageTile;
-import com.builtbroken.energystorageblock.network.MessageDesc;
-import com.builtbroken.energystorageblock.network.MessageTileEnergy;
-import com.builtbroken.energystorageblock.network.NetworkHandler;
+import com.builtbroken.energystorageblock.content.cube.parts.EnergyBlockStorage;
+import com.builtbroken.energystorageblock.lib.energy.EnergySideState;
+import com.builtbroken.energystorageblock.lib.energy.EnergySideWrapper;
+import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
+import com.builtbroken.energystorageblock.lib.network.IDescMessageTile;
+import com.builtbroken.energystorageblock.lib.network.MessageDesc;
+import com.builtbroken.energystorageblock.lib.network.MessageTileEnergy;
+import com.builtbroken.energystorageblock.lib.network.NetworkHandler;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;

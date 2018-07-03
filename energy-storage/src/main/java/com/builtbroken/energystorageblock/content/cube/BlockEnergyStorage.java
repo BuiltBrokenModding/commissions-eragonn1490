@@ -1,9 +1,9 @@
-package com.builtbroken.energystorageblock.block;
+package com.builtbroken.energystorageblock.content.cube;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
-import com.builtbroken.energystorageblock.energy.EnergySideState;
-import com.builtbroken.energystorageblock.energy.EnergySideWrapper;
-import com.builtbroken.energystorageblock.energy.PropertyEnergySideState;
+import com.builtbroken.energystorageblock.lib.energy.EnergySideState;
+import com.builtbroken.energystorageblock.lib.energy.EnergySideWrapper;
+import com.builtbroken.energystorageblock.lib.energy.PropertyEnergySideState;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;

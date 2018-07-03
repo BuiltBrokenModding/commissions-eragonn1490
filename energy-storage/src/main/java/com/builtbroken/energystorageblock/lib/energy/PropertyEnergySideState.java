@@ -1,4 +1,4 @@
-package com.builtbroken.energystorageblock.energy;
+package com.builtbroken.energystorageblock.lib.energy;
 
 import com.google.common.collect.Lists;
 import net.minecraft.block.properties.PropertyEnum;

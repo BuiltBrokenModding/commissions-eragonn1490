@@ -1,7 +1,7 @@
-package com.builtbroken.energystorageblock.gui;
+package com.builtbroken.energystorageblock.content.cube.gui;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
-import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;

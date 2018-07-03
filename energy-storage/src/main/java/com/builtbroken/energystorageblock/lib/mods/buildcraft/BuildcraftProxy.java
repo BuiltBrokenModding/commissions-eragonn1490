@@ -1,12 +1,12 @@
-package com.builtbroken.energystorageblock.mods.buildcraft;
+package com.builtbroken.energystorageblock.lib.mods.buildcraft;
 
 import buildcraft.api.mj.IMjReceiver;
 import buildcraft.api.mj.MjAPI;
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
-import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
-import com.builtbroken.energystorageblock.mods.EnergyModProxy;
+import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;

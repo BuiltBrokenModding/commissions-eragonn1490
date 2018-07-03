@@ -1,7 +1,7 @@
-package com.builtbroken.energystorageblock.mods.ic2;
+package com.builtbroken.energystorageblock.lib.mods.ic2;
 
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
-import com.builtbroken.energystorageblock.mods.EnergyModProxy;
+import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
 import ic2.api.energy.event.EnergyTileLoadEvent;
 import ic2.api.energy.event.EnergyTileUnloadEvent;
 import ic2.api.energy.tile.IEnergySink;

@@ -1,7 +1,7 @@
-package com.builtbroken.energystorageblock.mods.buildcraft;
+package com.builtbroken.energystorageblock.lib.mods.buildcraft;
 
 import buildcraft.api.mj.MjAPI;
-import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;

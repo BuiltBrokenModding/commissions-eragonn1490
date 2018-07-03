@@ -1,7 +1,7 @@
 package com.builtbroken.energystorageblock;
 
-import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
-import com.builtbroken.energystorageblock.gui.ContainerEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.gui.ContainerEnergyStorage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;

@@ -1,8 +1,8 @@
 package com.builtbroken.energystorageblock.client;
 
 import com.builtbroken.energystorageblock.CommonProxy;
-import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
-import com.builtbroken.energystorageblock.gui.GuiEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.gui.GuiEnergyStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
