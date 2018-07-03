@@ -33,7 +33,7 @@ public class EnergySideWrapper implements IEnergyStorage
     @Override
     public int extractEnergy(int maxExtract, boolean simulate)
     {
-        if (canReceive())
+        if (canExtract())
         {
             return host.energyStorage.receiveEnergy(maxExtract, simulate);
         }
