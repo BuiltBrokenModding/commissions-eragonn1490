@@ -2,6 +2,7 @@ package com.builtbroken.energystorageblock.mods.buildcraft;
 
 import buildcraft.api.mj.MjAPI;
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -27,7 +28,7 @@ public class MjCapabilityProvider implements ICapabilityProvider
     @Override
     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
     {
-        if (tile.hasCapability(CapabilityEnergy.ENERGY, facing))
+        if (ConfigPowerSystem.ENABLE_BUILDCRAFT && tile.hasCapability(CapabilityEnergy.ENERGY, facing))
         {
             return capability == MjAPI.CAP_RECEIVER || capability == MjAPI.CAP_CONNECTOR || capability == MjAPI.CAP_PASSIVE_PROVIDER;
         }

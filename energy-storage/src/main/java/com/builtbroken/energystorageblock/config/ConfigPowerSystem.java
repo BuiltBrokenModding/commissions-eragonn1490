@@ -11,15 +11,18 @@ import net.minecraftforge.common.config.Config;
 @Config.LangKey("config.icbmclassic:ic2.title")
 public class ConfigPowerSystem
 {
-    @Config.Name("from_ic2")
-    @Config.Comment("How much (EU) IC2 energy to turn into (FE) Forge energy")
+    @Config.Name("fe_per_eu")
+    @Config.Comment("How much (FE) Forge energy to exchange for (EU) IC2 energy")
     @Config.RangeInt(min = 0)
-    public static double FROM_IC2 = 4D; //Matched with Mekanism
+    public static double FE_PER_EU = 4; //Matched with Mekanism
 
-    @Config.Name("from_buildcraft")
-    @Config.Comment("How much (MJ) builcraft energy to turn into (FE) Forge energy")
+    @Config.Name("mj_per_fe")
+    @Config.Comment("How much (FE) Forge energy to exchange for (MJ) builcraft energy" +
+            "Keep value low to prevent rounding problems. FE is an integer can go to ~2Billion in value." +
+            "While MJ is a long and can go to a ~9BillionBillion in value. Massively larger in size hence the need" +
+            "for small values")
     @Config.RangeInt(min = 0)
-    public static double FROM_BUILDCRAFT = 0.1D;
+    public static double FE_PER_MJ = 10;
 
     @Config.Name("enable_ic2")
     @Config.Comment("Set to true to enable IC2 (EU) power support. Requires restart to take full effect.")

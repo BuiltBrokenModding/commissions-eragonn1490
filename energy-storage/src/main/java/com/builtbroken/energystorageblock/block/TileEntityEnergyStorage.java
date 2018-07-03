@@ -371,7 +371,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         if (ConfigPowerSystem.ENABLE_IC2)
         {
             int need = energyStorage.getMaxEnergyStored() - energyStorage.getEnergyStored();
-            return need / ConfigPowerSystem.FROM_IC2;
+            return need / ConfigPowerSystem.FE_PER_EU;
         }
         return 0;
     }
@@ -389,9 +389,9 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     {
         if (ConfigPowerSystem.ENABLE_IC2)
         {
-            int energy = (int) Math.floor(amount * ConfigPowerSystem.FROM_IC2);
+            int energy = (int) Math.floor(amount * ConfigPowerSystem.FE_PER_EU);
             int received = energyStorage.receiveEnergy(energy, false);
-            return amount - (received / ConfigPowerSystem.FROM_IC2);
+            return amount - (received / ConfigPowerSystem.FE_PER_EU);
         }
         return amount;
     }
@@ -413,7 +413,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
         if (ConfigPowerSystem.ENABLE_IC2)
         {
             int out = energyStorage.extractEnergy(ConfigEnergyStorage.OUTPUT_LIMIT, true);
-            return out / ConfigPowerSystem.FROM_IC2;
+            return out / ConfigPowerSystem.FE_PER_EU;
         }
         return 0;
     }
@@ -422,7 +422,7 @@ public class TileEntityEnergyStorage extends TileEntity implements ITickable, IE
     @Optional.Method(modid = "ic2")
     public void drawEnergy(double amount)
     {
-        int energy = (int) Math.ceil(amount * ConfigPowerSystem.FROM_IC2);
+        int energy = (int) Math.ceil(amount * ConfigPowerSystem.FE_PER_EU);
         energyStorage.extractEnergy(energy, false);
     }
 

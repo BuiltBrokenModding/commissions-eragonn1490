@@ -3,6 +3,7 @@ package com.builtbroken.energystorageblock.mods.buildcraft;
 import buildcraft.api.mj.IMjConnector;
 import buildcraft.api.mj.IMjPassiveProvider;
 import buildcraft.api.mj.IMjReceiver;
+import buildcraft.api.mj.MjAPI;
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
@@ -30,13 +31,13 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
     @Override
     public long getPowerRequested()
     {
-        if (tile.canInputEnergySide(side))
+        if (ConfigPowerSystem.ENABLE_BUILDCRAFT && tile.canInputEnergySide(side))
         {
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)
             {
                 int energyNeeded = energyStorage.receiveEnergy(ConfigEnergyStorage.INPUT_LIMIT, true);
-                return (long) Math.floor(energyNeeded / ConfigPowerSystem.FROM_BUILDCRAFT);
+                return (long) Math.min(ConfigEnergyStorage.OUTPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE, Math.floor(BuildcraftProxy.toBuildcraftEnergy(energyNeeded)));
             }
         }
         return 0;
@@ -45,19 +46,20 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
     @Override
     public long receivePower(long microJoules, boolean simulate)
     {
-        if (tile.canInputEnergySide(side))
+        if (ConfigPowerSystem.ENABLE_BUILDCRAFT && tile.canInputEnergySide(side))
         {
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)
             {
+                microJoules = Math.min(microJoules, ConfigEnergyStorage.INPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE);
                 //Convert to FE
-                int energy = (int) Math.floor(microJoules * ConfigPowerSystem.FROM_BUILDCRAFT);
+                int energy = (int) Math.floor(BuildcraftProxy.toForgeEnergy(microJoules));
 
                 //Get amount received
                 int taken = energyStorage.receiveEnergy(energy, simulate);
 
                 //Convert
-                long taken_mj = (long) Math.ceil(taken / ConfigPowerSystem.FROM_BUILDCRAFT);
+                long taken_mj = (long) Math.ceil(BuildcraftProxy.toBuildcraftEnergy(taken));
 
                 //Return remain
                 return microJoules - taken_mj;
@@ -69,28 +71,28 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
     @Override
     public boolean canConnect(@Nonnull IMjConnector other)
     {
-        return true;
+        return ConfigPowerSystem.ENABLE_BUILDCRAFT;
     }
 
     @Override
     public long extractPower(long min, long max, boolean simulate)
     {
-        if (tile.canOutputEnergySide(side))
+        if (ConfigPowerSystem.ENABLE_BUILDCRAFT && tile.canOutputEnergySide(side))
         {
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)
             {
-                int fe = (int) Math.floor(max / ConfigPowerSystem.FROM_BUILDCRAFT);
+                int fe = (int) Math.floor(BuildcraftProxy.toForgeEnergy(max));
                 fe = energyStorage.extractEnergy(fe, true);
 
-                long energy = (long) Math.floor(fe * ConfigPowerSystem.FROM_BUILDCRAFT);
+                long energy = (long) Math.min(ConfigEnergyStorage.OUTPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE, Math.floor(BuildcraftProxy.toBuildcraftEnergy(fe)));
 
                 if (energy > min)
                 {
                     energy = Math.min(energy, max);
                     if (!simulate)
                     {
-                        fe = (int) Math.ceil(energy / ConfigPowerSystem.FROM_BUILDCRAFT);
+                        fe = (int) Math.ceil(BuildcraftProxy.toForgeEnergy(energy ));
                         energyStorage.extractEnergy(fe, false);
                     }
                     return fe;

@@ -34,21 +34,21 @@ public class IC2Proxy extends EnergyModProxy
             {
                 //Get demand and convert to FE power
                 double demand = ((IEnergySink) target).getDemandedEnergy();
-                int request = (int) Math.floor(demand * ConfigPowerSystem.FROM_IC2);
+                int request = (int) Math.floor(demand * ConfigPowerSystem.FE_PER_EU);
 
                 //Check how much power we can remove
                 int give = energyStorage.extractEnergy(request, true);
                 if (give > 0)
                 {
                     //Convert give to IC2
-                    double inject = give / ConfigPowerSystem.FROM_IC2;
+                    double inject = give / ConfigPowerSystem.FE_PER_EU;
 
                     //Inject energy
                     double leftOver = ((IEnergySink) target).injectEnergy(enumFacing, inject, 1);
 
                     //Remove energy from storage
                     inject -= leftOver;
-                    int remove = (int) Math.ceil(inject * ConfigPowerSystem.FROM_IC2);
+                    int remove = (int) Math.ceil(inject * ConfigPowerSystem.FE_PER_EU);
                     energyStorage.extractEnergy(remove, false);
                 }
                 return true;
@@ -71,13 +71,13 @@ public class IC2Proxy extends EnergyModProxy
             if (offer > 0)
             {
                 //Convert to IC2 power
-                double insert = offer / ConfigPowerSystem.FROM_IC2;
+                double insert = offer / ConfigPowerSystem.FE_PER_EU;
 
                 //Give energy
                 double taken = ElectricItem.manager.charge(stack, insert, tier, false, false);
 
                 //Drain energy from storage
-                int energy = (int) Math.ceil(taken * ConfigPowerSystem.FROM_IC2);
+                int energy = (int) Math.ceil(taken * ConfigPowerSystem.FE_PER_EU);
                 energyStorage.extractEnergy(energy, false);
             }
 
@@ -96,21 +96,21 @@ public class IC2Proxy extends EnergyModProxy
             int tier = ((IElectricItem) stack.getItem()).getTier(stack);
 
             //Calculate max drain from battery
-            double drain = limit / ConfigPowerSystem.FROM_IC2;
+            double drain = limit / ConfigPowerSystem.FE_PER_EU;
             drain = ElectricItem.manager.discharge(stack, drain, tier, false, true, true);
 
             //Calculate max insert into tile
-            int input = (int) Math.floor(drain * ConfigPowerSystem.FROM_IC2);
+            int input = (int) Math.floor(drain * ConfigPowerSystem.FE_PER_EU);
             input = energyStorage.receiveEnergy(input, true);
 
             if (input > 0)
             {
                 //Drain battery
-                drain = input / ConfigPowerSystem.FROM_IC2;
+                drain = input / ConfigPowerSystem.FE_PER_EU;
                 drain = ElectricItem.manager.discharge(stack, drain, tier, false, true, false);
 
                 //Insert into tile
-                input = (int) Math.floor(drain * ConfigPowerSystem.FROM_IC2);
+                input = (int) Math.floor(drain * ConfigPowerSystem.FE_PER_EU);
                 energyStorage.receiveEnergy(input, false);
             }
 

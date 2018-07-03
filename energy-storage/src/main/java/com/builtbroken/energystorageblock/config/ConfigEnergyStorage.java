@@ -11,18 +11,28 @@ import net.minecraftforge.common.config.Config;
 @Config.LangKey("config.icbmclassic:battery.title")
 public class ConfigEnergyStorage
 {
-    @Config.Name("battery_tier_1_capacity")
-    @Config.Comment("Amount of energy the energy block can store")
+    @Config.Name("forge_energy_capacity")
+    @Config.Comment("Amount of energy the energy block can store, in Forge Energy")
     @Config.RangeInt(min = 1)
     public static int CAPACITY = 100000;
 
-    @Config.Name("battery_tier_1_input")
-    @Config.Comment("Transfer limit into the energy block")
+    @Config.Name("forge_energy_input_limit")
+    @Config.Comment("Transfer limit into the energy block, in Forge Energy")
     @Config.RangeInt(min = 1)
     public static int INPUT_LIMIT = 10000;
 
-    @Config.Name("battery_tier_1_output")
-    @Config.Comment("Transfer limit out of the energy block")
+    @Config.Name("forge_energy_output_limit")
+    @Config.Comment("Transfer limit out of the energy block, in Forge Energy")
     @Config.RangeInt(min = 1)
     public static int OUTPUT_LIMIT = 10000;
+
+    @Config.Name("buildcraft_input_limit")
+    @Config.Comment("Transfer limit into the energy block in MJ. Helps smooth out handling for the mod. Still works with existing FE limits.")
+    @Config.RangeInt(min = 1)
+    public static int INPUT_LIMIT_BC = 200;
+
+    @Config.Name("buildcraft_output_limit")
+    @Config.Comment("Transfer limit out of the energy block in MJ. Helps smooth out handling for the mod. Still works with existing FE limits.")
+    @Config.RangeInt(min = 1)
+    public static int OUTPUT_LIMIT_BC = 200;
 }

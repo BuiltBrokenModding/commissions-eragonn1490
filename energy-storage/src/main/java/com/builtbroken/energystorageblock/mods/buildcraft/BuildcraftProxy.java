@@ -4,6 +4,7 @@ import buildcraft.api.mj.IMjReceiver;
 import buildcraft.api.mj.MjAPI;
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import com.builtbroken.energystorageblock.block.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import com.builtbroken.energystorageblock.mods.EnergyModProxy;
 import net.minecraft.tileentity.TileEntity;
@@ -49,7 +50,7 @@ public class BuildcraftProxy extends EnergyModProxy
     public boolean outputPower(TileEntity target, TileEntity source, IEnergyStorage energyStorage, EnumFacing enumFacing)
     {
         //Check that we support output for side
-        if (source.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
+        if (ConfigPowerSystem.ENABLE_BUILDCRAFT && source.hasCapability(CapabilityEnergy.ENERGY, enumFacing.getOpposite()))
         {
             //Check that target can receive energy
             if (target.hasCapability(MjAPI.CAP_RECEIVER, enumFacing))
@@ -58,23 +59,24 @@ public class BuildcraftProxy extends EnergyModProxy
                 if (receiver != null && receiver.canReceive())
                 {
                     long request = receiver.getPowerRequested();
+                    request = Math.min(request, ConfigEnergyStorage.OUTPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE);
                     if (request > 0)
                     {
                         //Convert and check extract
-                        int energy = (int) Math.floor(request * ConfigPowerSystem.FROM_BUILDCRAFT);
+                        int energy = (int) Math.floor(toForgeEnergy(request));
                         energy = energyStorage.extractEnergy(energy, true);
 
                         if (energy > 0)
                         {
                             //Convert and insert
-                            long insert = (long) Math.floor(energy / ConfigPowerSystem.FROM_BUILDCRAFT);
+                            long insert = (long) Math.floor(toBuildcraftEnergy(energy));
                             long leftOver = receiver.receivePower(insert, false);
 
                             //Get energy taken
                             long taken = insert - leftOver;
 
                             //convert and remove energy
-                            energy = (int) Math.ceil(taken * ConfigPowerSystem.FROM_BUILDCRAFT);
+                            energy = (int) Math.ceil(toForgeEnergy(taken));
                             energyStorage.extractEnergy(energy, false);
                         }
                     }
@@ -83,5 +85,15 @@ public class BuildcraftProxy extends EnergyModProxy
             }
         }
         return false;
+    }
+
+    public static double toBuildcraftEnergy(int fe)
+    {
+        return (fe / ConfigPowerSystem.FE_PER_MJ) * MjAPI.MJ;
+    }
+
+    public static double toForgeEnergy(long mj)
+    {
+        return (mj / (double) MjAPI.MJ) * ConfigPowerSystem.FE_PER_MJ;
     }
 }
