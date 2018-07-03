@@ -1,20 +1,22 @@
-package com.builtbroken.energystorageblock.content.cube.parts;
+package com.builtbroken.energystorageblock.lib.energy;
 
-import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
+import com.builtbroken.energystorageblock.content.TileEntityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 /**
+ * Implementation of {@link IEnergyStorage} designed to work with {@link TileEntityEnergy}
+ *
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 6/30/2018.
  */
-public class EnergyBlockStorage implements IEnergyStorage
+public class EnergyStorageTile implements IEnergyStorage
 {
     protected int energy;
 
-    public final TileEntityEnergyStorage host;
+    public final TileEntityEnergy host;
 
-    public EnergyBlockStorage(TileEntityEnergyStorage host)
+    public EnergyStorageTile(TileEntityEnergy host)
     {
         this.host = host;
     }
@@ -25,7 +27,7 @@ public class EnergyBlockStorage implements IEnergyStorage
         if (canReceive() && maxReceive > 0)
         {
 
-            int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(ConfigEnergyStorage.INPUT_LIMIT, maxReceive));
+            int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(host.getInputLimit(null), maxReceive));
             if (!simulate)
             {
                 energy += energyReceived;
@@ -43,7 +45,7 @@ public class EnergyBlockStorage implements IEnergyStorage
     {
         if (canExtract() && maxExtract > 0)
         {
-            int energyExtracted = Math.min(energy, Math.min(ConfigEnergyStorage.OUTPUT_LIMIT, maxExtract));
+            int energyExtracted = Math.min(energy, Math.min(host.getOutputLimit(null), maxExtract));
             if (!simulate)
             {
                 energy -= energyExtracted;
@@ -71,13 +73,13 @@ public class EnergyBlockStorage implements IEnergyStorage
     @Override
     public boolean canExtract()
     {
-        return ConfigEnergyStorage.OUTPUT_LIMIT > 0;
+        return host.getOutputLimit(null) > 0;
     }
 
     @Override
     public boolean canReceive()
     {
-        return ConfigEnergyStorage.INPUT_LIMIT > 0;
+        return host.getInputLimit(null) > 0;
     }
 
     public void setEnergy(int energy)

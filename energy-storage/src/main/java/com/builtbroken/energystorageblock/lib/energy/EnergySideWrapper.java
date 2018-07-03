@@ -1,5 +1,7 @@
 package com.builtbroken.energystorageblock.lib.energy;
 
+import com.builtbroken.energystorageblock.content.TileEntityEnergy;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.energy.IEnergyStorage;
 
 /**
@@ -8,12 +10,14 @@ import net.minecraftforge.energy.IEnergyStorage;
  */
 public class EnergySideWrapper implements IEnergyStorage
 {
-    private final IEnergyStorage mainStorage;
+    private final TileEntityEnergy host;
+    public final EnumFacing side;
     public EnergySideState sideState = EnergySideState.INPUT;
 
-    public EnergySideWrapper(IEnergyStorage mainStorage)
+    public EnergySideWrapper(TileEntityEnergy host, EnumFacing side)
     {
-        this.mainStorage = mainStorage;
+        this.host = host;
+        this.side = side;
     }
 
     @Override
@@ -21,7 +25,7 @@ public class EnergySideWrapper implements IEnergyStorage
     {
         if (canReceive())
         {
-            return mainStorage.receiveEnergy(maxReceive, simulate);
+            return host.energyStorage.receiveEnergy(maxReceive, simulate);
         }
         return 0;
     }
@@ -31,7 +35,7 @@ public class EnergySideWrapper implements IEnergyStorage
     {
         if (canReceive())
         {
-            return mainStorage.receiveEnergy(maxExtract, simulate);
+            return host.energyStorage.receiveEnergy(maxExtract, simulate);
         }
         return 0;
     }
@@ -39,24 +43,24 @@ public class EnergySideWrapper implements IEnergyStorage
     @Override
     public int getEnergyStored()
     {
-        return mainStorage.getEnergyStored();
+        return host.energyStorage.getEnergyStored();
     }
 
     @Override
     public int getMaxEnergyStored()
     {
-        return mainStorage.getMaxEnergyStored();
+        return host.energyStorage.getMaxEnergyStored();
     }
 
     @Override
     public boolean canExtract()
     {
-        return sideState == EnergySideState.OUTPUT;
+        return host.getOutputLimit(side) > 0;
     }
 
     @Override
     public boolean canReceive()
     {
-        return sideState == EnergySideState.INPUT;
+        return host.getInputLimit(side) > 0;
     }
 }

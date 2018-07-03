@@ -3,9 +3,11 @@ package com.builtbroken.energystorageblock.lib.mods.buildcraft;
 import buildcraft.api.mj.IMjReceiver;
 import buildcraft.api.mj.MjAPI;
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
-import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
+import com.builtbroken.energystorageblock.config.ConfigWirelessEnergyTower;
+import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.content.wireless.connector.TileEntityWirelessConnector;
 import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -58,8 +60,7 @@ public class BuildcraftProxy extends EnergyModProxy
                 IMjReceiver receiver = target.getCapability(MjAPI.CAP_RECEIVER, enumFacing);
                 if (receiver != null && receiver.canReceive())
                 {
-                    long request = receiver.getPowerRequested();
-                    request = Math.min(request, ConfigEnergyStorage.OUTPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE);
+                    long request = limitOutput(source, receiver.getPowerRequested());
                     if (request > 0)
                     {
                         //Convert and check extract
@@ -86,6 +87,35 @@ public class BuildcraftProxy extends EnergyModProxy
         }
         return false;
     }
+
+    public static long limitOutput(TileEntity source, long mj)
+    {
+        int limit = 200;
+        if (source instanceof TileEntityEnergyStorage)
+        {
+            limit = ConfigEnergyStorage.OUTPUT_LIMIT_BC;
+        }
+        else if (source instanceof TileEntityWirelessConnector)
+        {
+            limit = ConfigWirelessEnergyTower.OUTPUT_LIMIT_BC;
+        }
+        return Math.min(mj, limit * MjAPI.ONE_MINECRAFT_JOULE);
+    }
+
+    public static long limitInput(TileEntity source, long mj)
+    {
+        int limit = 200;
+        if (source instanceof TileEntityEnergyStorage)
+        {
+            limit = ConfigEnergyStorage.INPUT_LIMIT_BC;
+        }
+        else if (source instanceof TileEntityWirelessConnector)
+        {
+            limit = ConfigWirelessEnergyTower.INPUT_LIMIT_BC;
+        }
+        return Math.min(mj, limit * MjAPI.ONE_MINECRAFT_JOULE);
+    }
+
 
     public static double toBuildcraftEnergy(int fe)
     {

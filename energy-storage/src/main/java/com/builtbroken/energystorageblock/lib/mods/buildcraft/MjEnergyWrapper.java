@@ -3,10 +3,9 @@ package com.builtbroken.energystorageblock.lib.mods.buildcraft;
 import buildcraft.api.mj.IMjConnector;
 import buildcraft.api.mj.IMjPassiveProvider;
 import buildcraft.api.mj.IMjReceiver;
-import buildcraft.api.mj.MjAPI;
-import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
+import com.builtbroken.energystorageblock.content.TileEntityEnergy;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -19,10 +18,10 @@ import javax.annotation.Nonnull;
  */
 public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
 {
-    private final TileEntityEnergyStorage tile;
+    private final TileEntityEnergy tile;
     private final EnumFacing side;
 
-    public MjEnergyWrapper(TileEntityEnergyStorage tile, EnumFacing side)
+    public MjEnergyWrapper(TileEntityEnergy tile, EnumFacing side)
     {
         this.tile = tile;
         this.side = side;
@@ -37,7 +36,7 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
             if (energyStorage != null)
             {
                 int energyNeeded = energyStorage.receiveEnergy(ConfigEnergyStorage.INPUT_LIMIT, true);
-                return (long) Math.min(ConfigEnergyStorage.OUTPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE, Math.floor(BuildcraftProxy.toBuildcraftEnergy(energyNeeded)));
+                return BuildcraftProxy.limitOutput(tile, (long) Math.floor(BuildcraftProxy.toBuildcraftEnergy(energyNeeded)));
             }
         }
         return 0;
@@ -51,7 +50,7 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
             IEnergyStorage energyStorage = tile.getCapability(CapabilityEnergy.ENERGY, null);
             if (energyStorage != null)
             {
-                microJoules = Math.min(microJoules, ConfigEnergyStorage.INPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE);
+                microJoules = BuildcraftProxy.limitInput(tile, microJoules);
                 //Convert to FE
                 int energy = (int) Math.floor(BuildcraftProxy.toForgeEnergy(microJoules));
 
@@ -85,14 +84,14 @@ public class MjEnergyWrapper implements IMjReceiver, IMjPassiveProvider
                 int fe = (int) Math.floor(BuildcraftProxy.toForgeEnergy(max));
                 fe = energyStorage.extractEnergy(fe, true);
 
-                long energy = (long) Math.min(ConfigEnergyStorage.OUTPUT_LIMIT_BC * MjAPI.ONE_MINECRAFT_JOULE, Math.floor(BuildcraftProxy.toBuildcraftEnergy(fe)));
+                long energy = BuildcraftProxy.limitOutput(tile, (long) Math.floor(BuildcraftProxy.toBuildcraftEnergy(fe)));
 
                 if (energy > min)
                 {
                     energy = Math.min(energy, max);
                     if (!simulate)
                     {
-                        fe = (int) Math.ceil(BuildcraftProxy.toForgeEnergy(energy ));
+                        fe = (int) Math.ceil(BuildcraftProxy.toForgeEnergy(energy));
                         energyStorage.extractEnergy(fe, false);
                     }
                     return fe;
