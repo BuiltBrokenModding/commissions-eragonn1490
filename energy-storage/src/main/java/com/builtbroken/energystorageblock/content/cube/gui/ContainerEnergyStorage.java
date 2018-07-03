@@ -1,7 +1,7 @@
 package com.builtbroken.energystorageblock.content.cube.gui;
 
 import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
-import com.builtbroken.energystorageblock.content.cube.parts.InventoryEnergyStorage;
+import com.builtbroken.energystorageblock.content.cube.InventoryEnergyStorage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;

@@ -1,7 +1,6 @@
-package com.builtbroken.energystorageblock.content.cube.parts;
+package com.builtbroken.energystorageblock.content.cube;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
-import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.ItemStackHandler;
