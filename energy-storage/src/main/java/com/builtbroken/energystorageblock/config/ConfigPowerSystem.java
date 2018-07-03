@@ -17,10 +17,7 @@ public class ConfigPowerSystem
     public static double FE_PER_EU = 4; //Matched with Mekanism
 
     @Config.Name("mj_per_fe")
-    @Config.Comment("How much (FE) Forge energy to exchange for (MJ) builcraft energy" +
-            "Keep value low to prevent rounding problems. FE is an integer can go to ~2Billion in value." +
-            "While MJ is a long and can go to a ~9BillionBillion in value. Massively larger in size hence the need" +
-            "for small values")
+    @Config.Comment("How much (FE) Forge energy to exchange for (MJ) builcraft energy")
     @Config.RangeInt(min = 0)
     public static double FE_PER_MJ = 10;
 
