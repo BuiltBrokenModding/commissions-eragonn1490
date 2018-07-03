@@ -8,7 +8,7 @@ import net.minecraftforge.common.config.Config;
  * Created by Dark(DarkGuardsman, Robert) on 2/22/2018.
  */
 @Config(modid = EnergyStorageBlockMod.DOMAIN, name = "energy_storage_mod/power_systems")
-@Config.LangKey("config.icbmclassic:ic2.title")
+@Config.LangKey("config.energystorageblock:power.system.title")
 public class ConfigPowerSystem
 {
     @Config.Name("fe_per_eu")

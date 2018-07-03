@@ -8,7 +8,7 @@ import net.minecraftforge.common.config.Config;
  * Created by Dark(DarkGuardsman, Robert) on 6/30/2018.
  */
 @Config(modid = EnergyStorageBlockMod.DOMAIN, name = "energy_storage_mod/energy_storage_block")
-@Config.LangKey("config.icbmclassic:battery.title")
+@Config.LangKey("config.energystorageblock:energy.storage.title")
 public class ConfigEnergyStorage
 {
     @Config.Name("forge_energy_capacity")
