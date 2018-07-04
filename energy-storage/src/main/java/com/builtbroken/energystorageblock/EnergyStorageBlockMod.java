@@ -2,11 +2,16 @@ package com.builtbroken.energystorageblock;
 
 import com.builtbroken.energystorageblock.content.cube.BlockEnergyStorage;
 import com.builtbroken.energystorageblock.content.cube.TileEntityEnergyStorage;
+import com.builtbroken.energystorageblock.content.wireless.connector.BlockWirelessConnector;
+import com.builtbroken.energystorageblock.content.wireless.connector.TileEntityWirelessConnector;
+import com.builtbroken.energystorageblock.content.wireless.controller.BlockWirelessController;
+import com.builtbroken.energystorageblock.content.wireless.controller.TileEntityWirelessController;
 import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
 import com.builtbroken.energystorageblock.lib.mods.buildcraft.BuildcraftProxy;
 import com.builtbroken.energystorageblock.lib.mods.ic2.IC2Proxy;
 import com.builtbroken.energystorageblock.lib.network.NetworkHandler;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.common.config.Config;
@@ -39,7 +44,10 @@ public class EnergyStorageBlockMod
     public static final String DOMAIN = "energystorageblock";
     public static final String PREFIX = DOMAIN + ":";
 
-    public static Block blockTrigger;
+    public static Block blockEnergyCube;
+
+    public static Block blockWirelessController;
+    public static Block blockWirelessConnector;
 
     @Mod.Instance(DOMAIN)
     public static EnergyStorageBlockMod INSTANCE;
@@ -75,6 +83,19 @@ public class EnergyStorageBlockMod
     {
         setModMetadata(DOMAIN, "Energy Storage Block Mod", metadata);
         energyModProxies.forEach(proxy -> proxy.init());
+
+        TileEntityWirelessController.multiBlockLayout = new Block[]
+                {
+                        Blocks.WEB,
+                        Blocks.DIRT,
+                        Blocks.DIRT,
+                        Blocks.COBBLESTONE,
+                        blockWirelessController,
+                        blockWirelessConnector,
+                        Blocks.COBBLESTONE
+                };
+        TileEntityWirelessController.multiBlockDeltaY = -2;
+
     }
 
     @Mod.EventHandler
@@ -86,14 +107,22 @@ public class EnergyStorageBlockMod
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
-        event.getRegistry().register(new ItemBlock(blockTrigger).setRegistryName(blockTrigger.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(blockEnergyCube).setRegistryName(blockEnergyCube.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(blockWirelessConnector).setRegistryName(blockWirelessConnector.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(blockWirelessController).setRegistryName(blockWirelessController.getRegistryName()));
     }
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event)
     {
-        event.getRegistry().register(blockTrigger = new BlockEnergyStorage());
+        event.getRegistry().register(blockEnergyCube = new BlockEnergyStorage());
         GameRegistry.registerTileEntity(TileEntityEnergyStorage.class, PREFIX + "energy_storage");
+
+        event.getRegistry().register(blockWirelessConnector = new BlockWirelessConnector());
+        GameRegistry.registerTileEntity(TileEntityWirelessConnector.class, PREFIX + "wireless_energy_connector");
+
+        event.getRegistry().register(blockWirelessController = new BlockWirelessController());
+        GameRegistry.registerTileEntity(TileEntityWirelessController.class, PREFIX + "wireless_energy_controller");
     }
 
     @SubscribeEvent

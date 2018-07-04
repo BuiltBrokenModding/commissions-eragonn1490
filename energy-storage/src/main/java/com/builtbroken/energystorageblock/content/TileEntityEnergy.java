@@ -1,18 +1,16 @@
 package com.builtbroken.energystorageblock.content;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
+import com.builtbroken.energystorageblock.TileEntityMachine;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.config.ConfigPowerSystem;
 import com.builtbroken.energystorageblock.lib.energy.EnergyStorageTile;
 import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
-import com.builtbroken.energystorageblock.lib.network.IDescMessageTile;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergySource;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -20,8 +18,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
@@ -37,7 +33,7 @@ import javax.annotation.Nullable;
         @Optional.Interface(iface = "ic2.api.energy.tile.IEnergySink", modid = "ic2"),
         @Optional.Interface(iface = "ic2.api.energy.tile.IEnergySource", modid = "ic2")
 })
-public abstract class TileEntityEnergy extends TileEntity implements IEnergySink, IEnergySource, IDescMessageTile
+public abstract class TileEntityEnergy extends TileEntityMachine implements IEnergySink, IEnergySource
 {
     //NBT keys
     public static final String NBT_ENERGY = "energy";
@@ -125,57 +121,19 @@ public abstract class TileEntityEnergy extends TileEntity implements IEnergySink
      * @return output limit
      */
     public abstract int getOutputLimit(@Nullable EnumFacing side);
-    //</editor-fold>
 
-    //<editor-fold desc="packets">
-    @Override
-    public SPacketUpdateTileEntity getUpdatePacket()
-    {
-        return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
-    }
-
-    @Override
-    public NBTTagCompound getUpdateTag()
-    {
-        return writeToNBT(new NBTTagCompound());
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
-    {
-        readFromNBT(pkt.getNbtCompound());
-    }
-
-    @Override
-    public NBTTagCompound writeDescMessage(NBTTagCompound tagCompound)
-    {
-        return writeData(tagCompound);
-    }
-
-    @Override
-    public void readDescMessage(NBTTagCompound tagCompound)
-    {
-        readData(tagCompound);
-    }
+    /**
+     * Amount of energy this tile can store
+     *
+     * @return energy to store
+     */
+    public abstract int getEnergyCapacity();
     //</editor-fold>
 
     //<editor-fold desc="save/load">
-    @Override
-    public void readFromNBT(NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
-        readData(compound);
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
-    {
-        return writeData(super.writeToNBT(compound));
-    }
-
     protected void readData(NBTTagCompound compound)
     {
+        super.readData(compound);
         //Load energy
         energyStorage.setEnergy(compound.getInteger(NBT_ENERGY));
     }
@@ -184,7 +142,7 @@ public abstract class TileEntityEnergy extends TileEntity implements IEnergySink
     {
         //Save energy
         compound.setInteger(NBT_ENERGY, energyStorage.getEnergyStored());
-        return compound;
+        return super.writeData(compound);
     }
     //</editor-fold>
 

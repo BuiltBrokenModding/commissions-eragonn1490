@@ -1,13 +1,16 @@
-package com.builtbroken.energystorageblock.content.wireless;
+package com.builtbroken.energystorageblock.content.wireless.controller.network;
 
+import com.builtbroken.energystorageblock.content.wireless.controller.TileEntityWirelessController;
 import com.builtbroken.triggerblock.cap.CapabilityTriggerHz;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -104,59 +107,75 @@ public class WirelessTowerHzHandler
     }
 
     /**
-     * Called to get all tiles of hz in range of position
+     * Collects a list of positions that contain wireless tower controllers.
      *
-     * @param hz
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     * @param range
-     * @return
+     * @param hz     - frequency to get tiles
+     * @param world  - world to look for tiles
+     * @param center - point to distance check from
+     * @param range  - range to get tiles inside
+     * @return list of positions matching tiles
      */
-    public static List<TileEntity> getTiles(final int hz, final World world, final double x, final double y, final double z, final double range)
+    public static List<BlockPos> getTiles(final int hz, final World world, final BlockPos center, final double range)
     {
         WirelessTowerHzHandler hzHandler = get(world);
-        final List<TileEntity> tiles = new ArrayList();
+        final List<TileEntityWirelessController> tiles = new ArrayList();
         if (hzHandler.hzToTile.containsKey(hz))
         {
             final List<BlockPos> invalid = new ArrayList();
 
             //Loop tiles
-            hzHandler.hzToTile.get(hz).forEach(blockPos -> {
-
-                //Collect good tiles
-                TileEntity tileEntity = world.getTileEntity(blockPos);
-
-                if (tileEntity instanceof TileEntity
-                        && !tileEntity.isInvalid()
-                        && tileEntity.getWorld() == world
-                        && tileEntity.getPos() != null)
+            for (BlockPos blockPos : hzHandler.hzToTile.get(hz))
+            {
+                //Ensure area is loaded so not to load chunks
+                if (world.isBlockLoaded(blockPos))
                 {
-                    //Check that same world and is in range
-                    //  range is box shaped, replace with [sqrt(x^2 + y^2 + z^2) < range] for sphere shaped
-                    if (inRange(x, tileEntity.getPos().getX(), range)
-                            && inRange(y, tileEntity.getPos().getY(), range)
-                            && inRange(z, tileEntity.getPos().getZ(), range))
-                    {
+                    //Get tile at location
+                    TileEntity tileEntity = world.getTileEntity(blockPos);
 
-                        tiles.add((TileEntity) tileEntity);
+                    //Validate tile is usable
+                    if (tileEntity instanceof TileEntityWirelessController
+                            && !tileEntity.isInvalid()
+                            && tileEntity.getWorld() == world
+                            && tileEntity.getPos() != null)
+                    {
+                        //Check that same world and is in range
+                        //  range is box shaped, replace with [sqrt(x^2 + y^2 + z^2) < range] for sphere shaped
+                        if (inRange(center.getX(), tileEntity.getPos().getX(), range)
+                                && inRange(center.getY(), tileEntity.getPos().getY(), range)
+                                && inRange(center.getZ(), tileEntity.getPos().getZ(), range))
+                        {
+
+                            //Collect tile to allow sorting, converted to block pos at end
+                            tiles.add((TileEntityWirelessController) tileEntity);
+                        }
+                    }
+                    //Mark bad tiles for removal
+                    //  should not happen, but exists just
+                    //  in case of other mods breaking logic
+                    else
+                    {
+                        invalid.add(blockPos);
                     }
                 }
-                //Mark bad tiles for removal
-                //  should not happen, but exists just
-                //  in case of other mods breaking logic
+                //Remove tiles that are not load
+                //  Should not happen as tiles remove themselves on unload
                 else
                 {
                     invalid.add(blockPos);
                 }
-            });
+            }
 
             //Remove bad tiles
             invalid.forEach(blockPos -> hzHandler.remove(blockPos));
+
+            //Sort data to improve energy transfer
+            Collections.sort(tiles, new TowerSorter(center));
+
+            //Convert data to block pos
+            return tiles.stream().map(TileEntity::getPos).collect(Collectors.toList());
         }
 
-        return tiles;
+        return new ArrayList();
     }
 
     //Simple method to check range

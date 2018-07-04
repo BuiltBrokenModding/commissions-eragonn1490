@@ -80,6 +80,12 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
         return ConfigWirelessEnergyTower.OUTPUT_LIMIT;
     }
 
+    @Override
+    public int getEnergyCapacity()
+    {
+        return ConfigWirelessEnergyTower.CAPACITY;
+    }
+
     public boolean shouldOutputEnergyToTiles()
     {
         return shouldOutputEnergy;

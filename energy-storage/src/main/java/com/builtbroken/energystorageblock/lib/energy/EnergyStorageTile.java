@@ -1,6 +1,5 @@
 package com.builtbroken.energystorageblock.lib.energy;
 
-import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.content.TileEntityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -67,7 +66,7 @@ public class EnergyStorageTile implements IEnergyStorage
     @Override
     public int getMaxEnergyStored()
     {
-        return ConfigEnergyStorage.CAPACITY;
+        return host.getEnergyCapacity();
     }
 
     @Override

@@ -17,7 +17,7 @@ public class ClientReg
     @SubscribeEvent
     public static void registerAllModels(ModelRegistryEvent event)
     {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(EnergyStorageBlockMod.blockTrigger),
-                0, new ModelResourceLocation(EnergyStorageBlockMod.blockTrigger.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(EnergyStorageBlockMod.blockEnergyCube),
+                0, new ModelResourceLocation(EnergyStorageBlockMod.blockEnergyCube.getRegistryName(), "inventory"));
     }
 }
