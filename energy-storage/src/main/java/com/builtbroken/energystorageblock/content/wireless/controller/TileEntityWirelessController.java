@@ -14,7 +14,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -35,10 +34,10 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
 
     protected boolean hzChanged = false;
 
-    private final CapabilityWirelessHz capabilityHz = new CapabilityWirelessHz(this);
+    public final CapabilityWirelessHz capabilityHz = new CapabilityWirelessHz(this);
 
     private TileEntityWirelessConnector connector;
-    private List<BlockPos> connectionPoints = new ArrayList();
+    public List<BlockPos> connectionPoints = new ArrayList();
 
 
     private boolean sendDescPacket = false;
@@ -242,12 +241,6 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
         return super.getCapability(capability, facing);
     }
 
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
-    {
-        return oldState.getBlock() != newSate.getBlock();
-    }
-
     public boolean isMultiBlockFormed()
     {
         return isMultiBlockFormed;
@@ -255,6 +248,25 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
 
     protected boolean checkMultiBlock()
     {
+        //Get start position
+        BlockPos pos = getPos().up(multiBlockDeltaY);
+
+        //Loop array that defines the multi-block
+        for (int i = multiBlockLayout.length - 1; i >= 0; i--)
+        {
+            //Get block at position
+            Block checkBlock = multiBlockLayout[i];
+
+            //Check block
+            IBlockState blockState = world.getBlockState(pos);
+            if (checkBlock != blockState.getBlock())
+            {
+                return false;
+            }
+
+            //Move up
+            pos = pos.up();
+        }
         return true;
     }
 

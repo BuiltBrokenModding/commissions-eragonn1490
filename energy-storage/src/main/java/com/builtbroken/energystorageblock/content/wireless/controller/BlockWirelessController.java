@@ -12,6 +12,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -67,8 +68,17 @@ public class BlockWirelessController extends Block implements ITileEntityProvide
                             }
                         }
                     }
+                    return true;
                 }
-                return true;
+                else if (stack.getItem() == Items.STICK)
+                {
+                    if (!worldIn.isRemote)
+                    {
+                        playerIn.sendMessage(new TextComponentTranslation("Connections: " + ((TileEntityWirelessController) tile).connectionPoints.size()));
+                        playerIn.sendMessage(new TextComponentTranslation("Hz: " + ((TileEntityWirelessController) tile).capabilityHz.getTriggerHz()));
+                    }
+                    return true;
+                }
             }
         }
         return false;
