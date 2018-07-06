@@ -1,7 +1,6 @@
 package com.builtbroken.triggerblock.item;
 
 import com.builtbroken.triggerblock.TriggerBlockMod;
-import com.builtbroken.triggerblock.block.TileEntityTrigger;
 import com.builtbroken.triggerblock.cap.CapabilityTriggerHz;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,7 +33,7 @@ public class ItemTriggerClear extends Item
         if (!worldIn.isRemote)
         {
             TileEntity tileEntity = worldIn.getTileEntity(pos);
-            if (tileEntity instanceof TileEntityTrigger)
+            if (tileEntity != null && tileEntity.hasCapability(CapabilityTriggerHz.CAPABILITY, null))
             {
                 tileEntity.getCapability(CapabilityTriggerHz.CAPABILITY, null).setTriggerHz(0);
                 player.sendMessage(new TextComponentTranslation(getUnlocalizedName() + ".info.cleared"));
