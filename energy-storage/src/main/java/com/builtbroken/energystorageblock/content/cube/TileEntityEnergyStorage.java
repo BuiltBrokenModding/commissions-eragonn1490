@@ -76,7 +76,9 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
                 NetworkHandler.sendToAllAround(this, new MessageTileEnergy(this, prevEnergy));
             }
         }
-        else if (markForRender)
+
+
+        if (markForRender)
         {
             markForRender = false;
 
@@ -178,6 +180,12 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
     public int getOutputLimit(EnumFacing side)
     {
         return ConfigEnergyStorage.OUTPUT_LIMIT;
+    }
+
+    @Override
+    public int getEnergyCapacity()
+    {
+        return ConfigEnergyStorage.CAPACITY;
     }
 
     public EnergySideState toggleEnergySide(EnumFacing side)
