@@ -1,6 +1,7 @@
 package com.builtbroken.energystorageblock.client;
 
 import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -17,7 +18,14 @@ public class ClientReg
     @SubscribeEvent
     public static void registerAllModels(ModelRegistryEvent event)
     {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(EnergyStorageBlockMod.blockEnergyCube),
-                0, new ModelResourceLocation(EnergyStorageBlockMod.blockEnergyCube.getRegistryName(), "inventory"));
+        registerBlockModel(EnergyStorageBlockMod.blockEnergyCube);
+        registerBlockModel(EnergyStorageBlockMod.blockWirelessController);
+        registerBlockModel(EnergyStorageBlockMod.blockWirelessConnector);
+    }
+
+    private static void registerBlockModel(Block block)
+    {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block),
+                0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
     }
 }

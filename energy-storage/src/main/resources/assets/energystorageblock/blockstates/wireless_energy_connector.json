@@ -1,0 +1,29 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube_all",
+    "textures": {
+      "all": "energystorageblock:blocks/wireless_energy_connector_input"
+    }
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ],
+    "output": {
+      "true": {
+        "textures": {
+          "all": "energystorageblock:blocks/wireless_energy_connector_output"
+        }
+      },
+      "false": {
+        "textures": {
+          "all": "energystorageblock:blocks/wireless_energy_connector_input"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube_all",
+    "textures": {
+      "all": "energystorageblock:blocks/wireless_energy_controller_incomplete"
+    }
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ],
+    "wireless": {
+      "incomplete": {
+        "textures": {
+          "all": "energystorageblock:blocks/wireless_energy_controller_incomplete"
+        }
+      },
+      "connected": {
+        "textures": {
+          "all": "energystorageblock:blocks/wireless_energy_controller_connected"
+        }
+      },
+      "disconnected": {
+        "textures": {
+          "all": "energystorageblock:blocks/wireless_energy_controller_disconnected"
+        }
+      },
+      "linked": {
+        "textures": {
+          "all": "energystorageblock:blocks/wireless_energy_controller_linked"
+        }
+      }
+    }
+  }
+}
