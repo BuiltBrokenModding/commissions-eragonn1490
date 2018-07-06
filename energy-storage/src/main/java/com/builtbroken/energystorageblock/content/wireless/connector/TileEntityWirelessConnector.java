@@ -20,6 +20,8 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
 
     private boolean shouldOutputEnergy = false;
     private boolean sendDescPacket = false;
+    private boolean markChanged = true;
+
     private TileEntityWirelessController controller;
 
     @Override
@@ -28,18 +30,50 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
         if (!world.isRemote)
         {
             //Only move power if we have power to move
-            if (energyStorage.getEnergyStored() > 0)
+            if (shouldOutputEnergyToTiles() && energyStorage.getEnergyStored() > 0)
             {
                 //Last handle connected tiles
                 outputPowerToConnectedTiles();
             }
 
+            //Send packet if needed
             if (sendDescPacket)
             {
                 sendDescPacket = false;
                 MessageDesc.send(this);
             }
         }
+
+        //Update environment as needed
+        if (markChanged)
+        {
+            markChanged = false;
+
+            //Update block state
+            if (world.getBlockState(getPos()).getValue(BlockWirelessConnector.OUTPUT_MODE) != shouldOutputEnergyToTiles())
+            {
+                world.setBlockState(getPos(), world.getBlockState(getPos()).withProperty(BlockWirelessConnector.OUTPUT_MODE, shouldOutputEnergyToTiles()));
+            }
+            //Else trigger environment updates
+            else
+            {
+                //Get chunk to save
+                markDirty();
+
+                //Update connections
+                world.markAndNotifyBlock(pos,
+                        world.getChunkFromBlockCoords(getPos()),
+                        world.getBlockState(getPos()),
+                        world.getBlockState(getPos()), 3);
+            }
+        }
+    }
+
+    @Override
+    public void readDescMessage(NBTTagCompound tagCompound)
+    {
+        super.readDescMessage(tagCompound);
+        markChanged = true;
     }
 
     @Override
@@ -59,7 +93,7 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
     @Override
     public boolean canInputEnergySide(@Nullable EnumFacing side)
     {
-        return !shouldOutputEnergyToTiles() && getController() != null;
+        return !shouldOutputEnergyToTiles();
     }
 
     @Override
@@ -97,7 +131,7 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
         {
             shouldOutputEnergy = energyOutput;
             sendDescPacket = true;
-            world.setBlockState(getPos(), world.getBlockState(getPos()).withProperty(BlockWirelessConnector.OUTPUT_MODE, energyOutput));
+            markChanged = true;
         }
     }
 
@@ -113,5 +147,6 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
     public void setController(TileEntityWirelessController controller)
     {
         this.controller = controller;
+        markChanged = true;
     }
 }

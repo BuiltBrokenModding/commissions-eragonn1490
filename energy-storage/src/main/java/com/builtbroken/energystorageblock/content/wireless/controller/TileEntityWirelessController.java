@@ -16,6 +16,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -83,7 +84,10 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
             }
 
             //Handle wireless network (output power)
-            handleWirelessNetwork();
+            if (ticks % 5 == 0)
+            {
+                handleWirelessNetwork();
+            }
 
             //Send packet if needed
             if (sendDescPacket)
@@ -135,11 +139,53 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
         //Only run logic if we have a frequency and are built
         if (capabilityHz.getTriggerHz() != 0 && isMultiBlockFormed())
         {
-            if (isOutputMode())
+            if (connector != null)
             {
-                //TODO pull power from connector and send to other towers
+                final IEnergyStorage energyStorage = connector.energyStorage;
+
+                int energyToOffer = energyStorage.getEnergyStored();
+                int connectors = connectionPoints.size(); //Will always be 1 connector (self)
+
+                if (energyToOffer > 0 && connectors > 1)
+                {
+                    //Loop possible connections
+                    for (BlockPos pos : connectionPoints)
+                    {
+                        //Make sure its loaded
+                        if (world.isBlockLoaded(pos))
+                        {
+                            //Get tile, make sure its a controller
+                            TileEntity tile = world.getTileEntity(pos);
+                            if (tile instanceof TileEntityWirelessController && tile != this)
+                            {
+                                IEnergyStorage targetStorage = ((TileEntityWirelessController) tile).getEnergyStorage();
+                                if (targetStorage != null)
+                                {
+                                    //Get energy to move
+                                    int offer = Math.min(ConfigWirelessEnergyTower.TRANSFER_LIMIT, (int) Math.floor(energyToOffer / (double) connectors));
+
+                                    //Dump energy into target and get energy moved
+                                    int energyMoved = targetStorage.receiveEnergy(offer, false);
+
+                                    //Decrease internal energy storage
+                                    energyToOffer -= energyStorage.extractEnergy(energyMoved, false);
+                                }
+                                connectors--;
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+
+    protected IEnergyStorage getEnergyStorage()
+    {
+        if (connector != null)
+        {
+            return connector.energyStorage;
+        }
+        return null;
     }
 
     protected void handleMultiBlock()

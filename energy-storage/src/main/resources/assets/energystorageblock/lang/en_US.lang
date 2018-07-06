@@ -22,3 +22,15 @@ tile.energystorageblock:energy.storage.info.power.side.set.north.none=Side north
 tile.energystorageblock:energy.storage.info.power.side.set.south.none=Side south disconnected
 tile.energystorageblock:energy.storage.info.power.side.set.east.none=Side east disconnected
 tile.energystorageblock:energy.storage.info.power.side.set.west.none=Side west disconnected
+
+## Wireless tower
+tile.energystorageblock:wireless.energy.connector.name=Wireless Connector
+tile.energystorageblock:wireless.energy.controller.name=Wireless Transmitter
+
+tile.energystorageblock:wireless.energy.connector.info.power=Energy: %d / %d FE
+
+tile.energystorageblock:wireless.energy.connector.info.power.true=Connector set to output power
+tile.energystorageblock:wireless.energy.connector.info.power.false=Connector set to input power
+
+tile.energystorageblock:wireless.energy.controller.info.set.new=Frequency is set to %s
+tile.energystorageblock:wireless.energy.controller.info.set.already=Frequency is already set, use a Zeroizer before setting a new value

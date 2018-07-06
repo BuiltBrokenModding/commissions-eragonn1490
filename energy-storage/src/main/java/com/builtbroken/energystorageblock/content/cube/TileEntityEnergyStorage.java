@@ -8,13 +8,10 @@ import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
 import com.builtbroken.energystorageblock.lib.network.MessageDesc;
 import com.builtbroken.energystorageblock.lib.network.MessageTileEnergy;
 import com.builtbroken.energystorageblock.lib.network.NetworkHandler;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -45,7 +42,7 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
 
     private int prevEnergy = -1;
     private boolean sendDescPacket = false;
-    private boolean markForRender = true;
+    private boolean markChanged = true;
 
     @Override
     public void update()
@@ -78,9 +75,9 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
         }
 
 
-        if (markForRender)
+        if (markChanged)
         {
-            markForRender = false;
+            markChanged = false;
 
             markDirty();
 
@@ -90,12 +87,6 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
                     world.getBlockState(getPos()),
                     world.getBlockState(getPos()), 3);
         }
-    }
-
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
-    {
-        return oldState.getBlock() != newSate.getBlock();
     }
 
     protected void dischargeBattery()
@@ -214,7 +205,7 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
     public void readDescMessage(NBTTagCompound tagCompound)
     {
         super.readDescMessage(tagCompound);
-        markForRender = true;
+        markChanged = true;
     }
 
     @Override

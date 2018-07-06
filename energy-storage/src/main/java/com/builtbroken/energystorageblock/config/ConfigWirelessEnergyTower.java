@@ -31,6 +31,11 @@ public class ConfigWirelessEnergyTower
     @Config.RangeInt(min = 1)
     public static int CAPACITY = 100000;
 
+    @Config.Name("transfer_limit")
+    @Config.Comment("Transfer limit from one tower to the next in Forge Energy")
+    @Config.RangeInt(min = 1)
+    public static int TRANSFER_LIMIT = 10000;
+
     @Config.Name("forge_energy_input_limit")
     @Config.Comment("Transfer limit into the energy block, in Forge Energy")
     @Config.RangeInt(min = 1)
