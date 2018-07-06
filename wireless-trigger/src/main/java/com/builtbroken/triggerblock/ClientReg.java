@@ -7,7 +7,9 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 @Mod.EventBusSubscriber(value = Side.CLIENT, modid = TriggerBlockMod.DOMAIN)
 public class ClientReg
 {
@@ -16,6 +18,9 @@ public class ClientReg
     {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(TriggerBlockMod.blockTrigger),
                 0, new ModelResourceLocation(TriggerBlockMod.blockTrigger.getRegistryName(), "inventory"));
+
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(TriggerBlockMod.blockTrigger),
+                0, new ModelResourceLocation(TriggerBlockMod.blockReprogrammer.getRegistryName(), "inventory"));
 
         ModelLoader.setCustomModelResourceLocation(TriggerBlockMod.itemTrigger,
                 0, new ModelResourceLocation(TriggerBlockMod.itemTrigger.getRegistryName(), "inventory"));
