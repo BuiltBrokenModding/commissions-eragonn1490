@@ -93,8 +93,12 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
 
     public void setOutputEnergyToTiles(boolean energyOutput)
     {
-        shouldOutputEnergy = energyOutput;
-        sendDescPacket = true;
+        if (shouldOutputEnergy != energyOutput)
+        {
+            shouldOutputEnergy = energyOutput;
+            sendDescPacket = true;
+            world.setBlockState(getPos(), world.getBlockState(getPos()).withProperty(BlockWirelessConnector.OUTPUT_MODE, energyOutput));
+        }
     }
 
     public TileEntityWirelessController getController()

@@ -6,14 +6,18 @@ import com.builtbroken.energystorageblock.content.wireless.connector.TileEntityW
 import com.builtbroken.energystorageblock.content.wireless.controller.network.WirelessTowerHzHandler;
 import com.builtbroken.energystorageblock.content.wireless.controller.prop.EnumWirelessState;
 import com.builtbroken.energystorageblock.lib.network.MessageDesc;
+import com.builtbroken.triggerblock.cap.CapabilityTriggerHz;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,22 +63,26 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
                 isMultiBlockFormed = checkMultiBlock();
                 handleWirelessState();
             }
+            //Check multi-block
             else if (ticks % ConfigWirelessEnergyTower.MULTI_BLOCK_SCAN_RATE == 0)
             {
                 handleMultiBlock();
             }
 
+            //Look for connections
             if (ticks % ConfigWirelessEnergyTower.CONNECTION_CHECK_RATE == 0)
             {
                 scanForWirelessConnections();
             }
 
+            //Update state if hz changed
             if (hzChanged)
             {
                 hzChanged = false;
                 handleWirelessState();
             }
 
+            //Handle wireless network (output power)
             handleWirelessNetwork();
 
             //Send packet if needed
@@ -169,6 +177,23 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
     {
         compound.setInteger(NBT_FREQUENCY, capabilityHz.getTriggerHz());
         return compound;
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
+    {
+        return capability == CapabilityTriggerHz.CAPABILITY || super.hasCapability(capability, facing);
+    }
+
+    @Override
+    @Nullable
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    {
+        if (capability == CapabilityTriggerHz.CAPABILITY)
+        {
+            return (T) capabilityHz;
+        }
+        return super.getCapability(capability, facing);
     }
 
     @Override
