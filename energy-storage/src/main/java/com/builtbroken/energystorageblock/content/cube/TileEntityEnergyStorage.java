@@ -1,5 +1,6 @@
 package com.builtbroken.energystorageblock.content.cube;
 
+import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import com.builtbroken.energystorageblock.config.ConfigEnergyStorage;
 import com.builtbroken.energystorageblock.content.TileEntityEnergy;
 import com.builtbroken.energystorageblock.lib.energy.EnergySideState;
@@ -8,6 +9,7 @@ import com.builtbroken.energystorageblock.lib.mods.EnergyModProxy;
 import com.builtbroken.energystorageblock.lib.network.MessageDesc;
 import com.builtbroken.energystorageblock.lib.network.MessageTileEnergy;
 import com.builtbroken.energystorageblock.lib.network.NetworkHandler;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -79,13 +81,19 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
         {
             markChanged = false;
 
+            //Mark dirty so tile saves
             markDirty();
 
-            //Update blocks so render changes
-            world.markAndNotifyBlock(pos,
-                    world.getChunkFromBlockCoords(getPos()),
-                    world.getBlockState(getPos()),
-                    world.getBlockState(getPos()), 3);
+            //Get block state
+            IBlockState currentState = world.getBlockState(getPos());
+            IBlockState actualState = EnergyStorageBlockMod.blockEnergyCube.getActualState(currentState, world, getPos());
+
+            //Set block to force a full update
+            world.setBlockState(getPos(), actualState);
+
+            //Remove and re-add to IC2 network
+            invalidate();
+            validate();
         }
     }
 
@@ -185,17 +193,9 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
         EnergySideWrapper wrapper = getEnergySideWrapper(side);
         wrapper.sideState = wrapper.sideState.next();
 
-        //Next tick send packet
+        //Next tick update and send packet
         sendDescPacket = true;
-
-        //Mark so the block saves
-        markDirty();
-
-        //Update blocks so wire connections change
-        world.markAndNotifyBlock(pos,
-                world.getChunkFromBlockCoords(getPos()),
-                world.getBlockState(getPos()),
-                world.getBlockState(getPos()), 3);
+        markChanged = true;
 
         //Return new state
         return wrapper.sideState;
@@ -278,6 +278,7 @@ public class TileEntityEnergyStorage extends TileEntityEnergy implements ITickab
         if (energySideWrapper[facing.ordinal()] == null)
         {
             energySideWrapper[facing.ordinal()] = new EnergySideWrapper(this, facing);
+            markChanged = true;
         }
         return energySideWrapper[facing.ordinal()];
     }

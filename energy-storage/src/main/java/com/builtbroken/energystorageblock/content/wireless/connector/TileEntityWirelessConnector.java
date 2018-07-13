@@ -1,9 +1,11 @@
 package com.builtbroken.energystorageblock.content.wireless.connector;
 
+import com.builtbroken.energystorageblock.EnergyStorageBlockMod;
 import com.builtbroken.energystorageblock.config.ConfigWirelessEnergyTower;
 import com.builtbroken.energystorageblock.content.TileEntityEnergy;
 import com.builtbroken.energystorageblock.content.wireless.controller.TileEntityWirelessController;
 import com.builtbroken.energystorageblock.lib.network.MessageDesc;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -57,14 +59,21 @@ public class TileEntityWirelessConnector extends TileEntityEnergy implements ITi
             //Else trigger environment updates
             else
             {
-                //Get chunk to save
+                markChanged = false;
+
+                //Mark dirty so tile saves
                 markDirty();
 
-                //Update connections
-                world.markAndNotifyBlock(pos,
-                        world.getChunkFromBlockCoords(getPos()),
-                        world.getBlockState(getPos()),
-                        world.getBlockState(getPos()), 3);
+                //Get block state
+                IBlockState currentState = world.getBlockState(getPos());
+                IBlockState actualState = EnergyStorageBlockMod.blockEnergyCube.getActualState(currentState, world, getPos());
+
+                //Set block to force a full update
+                world.setBlockState(getPos(), actualState);
+
+                //Remove and re-add to IC2 network
+                invalidate();
+                validate();
             }
         }
     }
