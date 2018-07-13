@@ -11,7 +11,9 @@ import com.builtbroken.energystorageblock.lib.mods.buildcraft.BuildcraftProxy;
 import com.builtbroken.energystorageblock.lib.mods.ic2.IC2Proxy;
 import com.builtbroken.energystorageblock.lib.network.NetworkHandler;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockColored;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.common.config.Config;
@@ -84,15 +86,15 @@ public class EnergyStorageBlockMod
         setModMetadata(DOMAIN, "Energy Storage Block Mod", metadata);
         energyModProxies.forEach(proxy -> proxy.init());
 
-        TileEntityWirelessController.multiBlockLayout = new Block[]
+        TileEntityWirelessController.multiBlockLayout = new Object[]
                 {
-                        Blocks.WEB,
-                        Blocks.DIRT,
-                        Blocks.DIRT,
-                        Blocks.COBBLESTONE,
-                        blockWirelessController,
+                        Blocks.WEB.getDefaultState(), //Block state is your meta
+                        Blocks.DIRT.getDefaultState(),
+                        Blocks.DIRT.getDefaultState(),
+                        Blocks.COBBLESTONE.getDefaultState(),
+                        blockWirelessController, //Can still use normal blocks to ignore meta
                         blockWirelessConnector,
-                        Blocks.COBBLESTONE
+                        Blocks.WOOL.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.MAGENTA)
                 };
         TileEntityWirelessController.multiBlockDeltaY = -2;
 

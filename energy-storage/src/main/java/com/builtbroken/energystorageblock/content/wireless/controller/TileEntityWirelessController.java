@@ -29,7 +29,8 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
 {
     public static final String NBT_FREQUENCY = "frequency";
 
-    public static Block[] multiBlockLayout;
+    public static Object[] multiBlockLayout;
+    public static int[] multiBlockMetaLayout;
     public static int multiBlockDeltaY;
 
     protected boolean hzChanged = false;
@@ -254,14 +255,31 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
         //Loop array that defines the multi-block
         for (int i = multiBlockLayout.length - 1; i >= 0; i--)
         {
-            //Get block at position
-            Block checkBlock = multiBlockLayout[i];
+            //Get entry (should be block or block state)
+            Object entry = multiBlockLayout[i];
 
-            //Check block
-            IBlockState blockState = world.getBlockState(pos);
-            if (checkBlock != blockState.getBlock())
+            if (entry instanceof Block)
             {
-                return false;
+                //Get block at position
+                Block checkBlock = (Block) entry;
+
+                //Check block
+                IBlockState blockState = world.getBlockState(pos);
+                if (checkBlock != blockState.getBlock())
+                {
+                    return false;
+                }
+            }
+            else if (entry instanceof IBlockState)
+            {
+                IBlockState state = (IBlockState) entry;
+
+                //Check block
+                IBlockState blockState = world.getBlockState(pos);
+                if (!state.equals(blockState))
+                {
+                    return false;
+                }
             }
 
             //Move up
