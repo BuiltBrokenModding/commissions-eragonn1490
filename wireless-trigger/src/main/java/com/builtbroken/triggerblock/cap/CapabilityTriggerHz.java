@@ -1,5 +1,6 @@
 package com.builtbroken.triggerblock.cap;
 
+import com.builtbroken.triggerblock.TriggerBlockMod;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.util.EnumFacing;
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = TriggerBlockMod.DOMAIN)
 public class CapabilityTriggerHz implements ITriggerHz, ICapabilityProvider, INBTSerializable<NBTTagInt>
 {
     @CapabilityInject(ITriggerHz.class)
