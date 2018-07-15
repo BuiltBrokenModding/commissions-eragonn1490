@@ -26,6 +26,7 @@ public class CapabilityWirelessHz implements ITriggerHz
         this.hz = hz;
         if (hz != prev && host.getWorld() != null)
         {
+            host.hzChanged = true;
             if (hz != 0)
             {
                 WirelessTowerHzHandler.get(host.getWorld()).add(host);
