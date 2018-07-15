@@ -41,6 +41,8 @@ public abstract class TileEntityEnergy extends TileEntityMachine implements IEne
     /** Main power storage */
     public final EnergyStorageTile energyStorage = new EnergyStorageTile(this);
 
+    private boolean hasValidated = false;
+
     /**
      * Called to output power to tiles on all 6 sides
      */
@@ -257,13 +259,22 @@ public abstract class TileEntityEnergy extends TileEntityMachine implements IEne
     public void invalidate()
     {
         super.invalidate();
-        EnergyStorageBlockMod.energyModProxies.forEach(proxy -> proxy.onTileInvalidate(this));
+        if (!hasValidated)
+        {
+            hasValidated = true;
+            EnergyStorageBlockMod.energyModProxies.forEach(proxy -> proxy.onTileInvalidate(this));
+        }
     }
 
     @Override
     public void validate()
     {
+        boolean wasInvalid = tileEntityInvalid;
         super.validate();
-        EnergyStorageBlockMod.energyModProxies.forEach(proxy -> proxy.onTileValidate(this));
+        if (hasValidated && wasInvalid)
+        {
+            hasValidated = false;
+            EnergyStorageBlockMod.energyModProxies.forEach(proxy -> proxy.onTileValidate(this));
+        }
     }
 }
