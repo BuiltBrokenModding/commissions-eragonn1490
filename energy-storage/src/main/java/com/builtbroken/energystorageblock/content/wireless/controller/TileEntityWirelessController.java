@@ -40,7 +40,6 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
     private TileEntityWirelessConnector connector;
     public List<BlockPos> connectionPoints = new ArrayList();
 
-
     private boolean sendDescPacket = false;
     private boolean isMultiBlockFormed = false;
 
@@ -143,10 +142,10 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
             {
                 final IEnergyStorage energyStorage = connector.energyStorage;
 
-                int energyToOffer = energyStorage.getEnergyStored();
-                int connectors = connectionPoints.size(); //Will always be 1 connector (self)
+                int energyToOffer = energyStorage.getEnergyStored() / 2; //Only send half of our power
+                int connectors = connectionPoints.size() - 1; // Will always be 1 connector (self)
 
-                if (energyToOffer > 0 && connectors > 1)
+                if (energyToOffer > 0 && connectors > 0)
                 {
                     //Loop possible connections
                     for (BlockPos pos : connectionPoints)
@@ -155,14 +154,20 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
                         if (world.isBlockLoaded(pos))
                         {
                             //Get tile, make sure its a controller
-                            TileEntity tile = world.getTileEntity(pos);
-                            if (tile instanceof TileEntityWirelessController && tile != this)
+                            TileEntity targetTile = world.getTileEntity(pos);
+                            if (targetTile instanceof TileEntityWirelessController && targetTile != this)
                             {
-                                IEnergyStorage targetStorage = ((TileEntityWirelessController) tile).getEnergyStorage();
+                                //Get tile's energy storage and try to send it power
+                                IEnergyStorage targetStorage = ((TileEntityWirelessController) targetTile).getEnergyStorage();
                                 if (targetStorage != null)
                                 {
                                     //Get energy to move
-                                    int offer = Math.min(ConfigWirelessEnergyTower.TRANSFER_LIMIT, (int) Math.floor(energyToOffer / (double) connectors));
+                                    int offer = energyToOffer / connectors; //Send a percentage of power to allow sharing
+                                    offer += energyToOffer % connectors; //Add remainder to prevent energy from stagnating
+                                    offer = Math.min(ConfigWirelessEnergyTower.TRANSFER_LIMIT, offer);
+
+                                    //Check that we can remove that much energy
+                                    offer = energyStorage.extractEnergy(offer, true);
 
                                     //Dump energy into target and get energy moved
                                     int energyMoved = targetStorage.receiveEnergy(offer, false);
@@ -170,6 +175,8 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
                                     //Decrease internal energy storage
                                     energyToOffer -= energyStorage.extractEnergy(energyMoved, false);
                                 }
+
+                                //Reduce connector count
                                 connectors--;
                             }
                         }
