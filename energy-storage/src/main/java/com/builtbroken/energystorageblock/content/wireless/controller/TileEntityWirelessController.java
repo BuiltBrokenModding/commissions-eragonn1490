@@ -9,11 +9,15 @@ import com.builtbroken.energystorageblock.lib.network.MessageDesc;
 import com.builtbroken.triggerblock.cap.CapabilityTriggerHz;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -42,6 +46,7 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
 
     private boolean sendDescPacket = false;
     private boolean isMultiBlockFormed = false;
+    private boolean prevMultiBlockFormed = false;
 
     private int ticks = 0;
 
@@ -60,13 +65,26 @@ public class TileEntityWirelessController extends TileEntityMachine implements I
             //First tick run logic
             if (ticks == 0)
             {
-                isMultiBlockFormed = checkMultiBlock();
+                handleMultiBlock();
                 handleWirelessState();
             }
             //Check multi-block
             else if (ticks % ConfigWirelessEnergyTower.MULTI_BLOCK_SCAN_RATE == 0)
             {
+                boolean prevMultiBlockFormed = isMultiBlockFormed;
                 handleMultiBlock();
+                //If built, display some effects to show it was built
+                if (isMultiBlockFormed && !prevMultiBlockFormed && ticks > 0)
+                {
+                    AxisAlignedBB bb = new AxisAlignedBB(getPos())
+                            .expand(10, 10, 10)
+                            .expand(-10, -10, -10);
+                    List<EntityPlayer> list = world.getEntitiesWithinAABB(EntityPlayer.class, bb, EntitySelectors.IS_ALIVE);
+                    for (EntityPlayer player : list)
+                    {
+                        player.sendStatusMessage(new TextComponentTranslation("tile.energystorageblock:wireless.energy.controller.info.built"), true);
+                    }
+                }
             }
 
             //Look for connections

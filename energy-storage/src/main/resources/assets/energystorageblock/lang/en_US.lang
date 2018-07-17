@@ -34,3 +34,5 @@ tile.energystorageblock:wireless.energy.connector.info.power.false=Connector set
 
 tile.energystorageblock:wireless.energy.controller.info.set.new=Frequency is set to %s
 tile.energystorageblock:wireless.energy.controller.info.set.already=Frequency is already set, use a Zeroizer before setting a new value
+
+tile.energystorageblock:wireless.energy.controller.info.built=Wireless Controller MultiBlock is generated
