@@ -1,6 +1,8 @@
 package com.builtbroken.craftblocks.paint;
 
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.ItemStackHandler;
@@ -37,19 +39,50 @@ public class TileEntityPainter extends TileEntity
 
     public int getDyeCount(EnumDyeColor enumDyeColor)
     {
+        int slot = getDyeSlot(enumDyeColor);
+        ItemStack stack = inventory.getStackInSlot(slot);
+        if (isDyeItem(enumDyeColor, stack))
+        {
+            return stack.getCount();
+        }
+        return 0;
+    }
 
+    public void consumeDye(EnumDyeColor enumDyeColor, int count)
+    {
+        int slot = getDyeSlot(enumDyeColor);
+        ItemStack stack = inventory.getStackInSlot(slot);
+        if (isDyeItem(enumDyeColor, stack))
+        {
+            stack.setCount(stack.getCount() - count);
+            if(stack.getCount() <= 0)
+            {
+                stack = null;
+            }
+            inventory.setStackInSlot(slot, stack);
+        }
+    }
+
+    public boolean isDyeItem(EnumDyeColor enumDyeColor, ItemStack stack)
+    {
+        return !stack.isEmpty()
+                && stack.getItem() == Items.DYE
+                && stack.getItemDamage() == enumDyeColor.getDyeDamage();
     }
 
     public boolean hasDye(EnumDyeColor enumDyeColor)
     {
-        int slot = getDyeSlot(enumDyeColor);
-
-        return
+        return getDyeCount(enumDyeColor) > 0;
     }
 
     public int getDyeSlot(EnumDyeColor enumDyeColor)
     {
         return DYE_SLOT_START + enumDyeColor.ordinal();
+    }
+
+    public ItemStack getStackInOutput()
+    {
+        return inventory.getStackInSlot(OUTPUT_SLOT);
     }
 
     @Override
