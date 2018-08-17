@@ -5,6 +5,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 8/15/2018.
  */
-public class TileEntityPainter extends TileEntity
+public class TileEntityPainter extends TileEntity implements ITickable
 {
     public static final int INVENTORY_SIZE = 18;
     public static final int OUTPUT_SLOT = 0;
@@ -36,6 +37,65 @@ public class TileEntityPainter extends TileEntity
     };
 
     public PainterRecipe currentRecipe;
+
+    public boolean machineOn = false;
+    public boolean canDoRecipe = false;
+    public int recipeTicks;
+
+    @Override
+    public void update()
+    {
+        //Only do logic server side, when machine is on, and if we have a worker for power
+        if(!world.isRemote && machineOn && hasWorkerPower())
+        {
+            //Only do logic if a recipe is active
+            if (currentRecipe != null)
+            {
+                //If no recipe try to find one (delay to avoid wasting CPU time)
+                if(!canDoRecipe && recipeTicks-- <= 0)
+                {
+                    //Check if we can do recipe
+                    canDoRecipe = currentRecipe.hasRecipe(this);
+
+                    //If can do recipe set timer to recipe
+                    if(canDoRecipe)
+                    {
+                        recipeTicks = currentRecipe.ticksToComplete;
+                    }
+                    //if can't do recipe set timer to next check number
+                    else
+                    {
+                        recipeTicks = 10;
+                    }
+                }
+
+                //Check if we can do recipe
+                if(canDoRecipe && recipeTicks-- <= 0)
+                {
+                    //Do recipe
+                    if(currentRecipe.doRecipe(this))
+                    {
+                        //Consume power
+                        consumeWorkerPower();
+                    }
+                    else
+                    {
+                        recipeTicks++; //keeps ticks from under flowing
+                    }
+                }
+            }
+        }
+    }
+
+    protected void consumeWorkerPower()
+    {
+
+    }
+
+    protected boolean hasWorkerPower()
+    {
+        return true;
+    }
 
     public int getDyeCount(EnumDyeColor enumDyeColor)
     {

@@ -21,7 +21,34 @@ public class PainterRecipe
     public Map<EnumDyeColor, Integer> dyeToUsage = new HashMap();
 
     /** Items to produce */
-    public ItemStack output;
+    public final ItemStack output;
+
+    public PainterRecipe(ItemStack output, EnumDyeColor... dyes)
+    {
+        this.output = output;
+        if (dyes != null)
+        {
+            for (EnumDyeColor dye : dyes)
+            {
+                setDyeUsage(dye, 1);
+            }
+        }
+    }
+
+    public PainterRecipe setDyeUsage(EnumDyeColor dye, int count)
+    {
+        if (dye != null)
+        {
+            dyeToUsage.put(dye, count);
+        }
+        return this;
+    }
+
+    public PainterRecipe setCompletionTime(int time)
+    {
+        this.ticksToComplete = time;
+        return this;
+    }
 
     /**
      * Called to check if the machine has the requirements for the recipe
@@ -34,6 +61,7 @@ public class PainterRecipe
         //Check if we have all dye required
         for (Map.Entry<EnumDyeColor, Integer> entry : dyeToUsage.entrySet())
         {
+            //If we have too few dye then we have no recipe
             if (painter.getDyeCount(entry.getKey()) < entry.getValue())
             {
                 return false;
