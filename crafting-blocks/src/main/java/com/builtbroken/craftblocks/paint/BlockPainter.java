@@ -4,9 +4,17 @@ import com.builtbroken.craftblocks.CraftingBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
 
@@ -19,8 +27,8 @@ public class BlockPainter extends Block implements ITileEntityProvider
     public BlockPainter()
     {
         super(Material.ROCK);
-        setRegistryName(CraftingBlocks.DOMAIN, "trigger_block");
-        setUnlocalizedName(CraftingBlocks.PREFIX + "trigger");
+        setRegistryName(CraftingBlocks.DOMAIN, "painter_block");
+        setUnlocalizedName(CraftingBlocks.PREFIX + "painter");
         setCreativeTab(CreativeTabs.REDSTONE);
     }
 
@@ -29,5 +37,42 @@ public class BlockPainter extends Block implements ITileEntityProvider
     public TileEntity createNewTileEntity(World worldIn, int meta)
     {
         return new TileEntityPainter();
+    }
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    {
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if (tile instanceof TileEntityPainter)
+        {
+            if (!worldIn.isRemote)
+            {
+                playerIn.openGui(CraftingBlocks.DOMAIN, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+    {
+        TileEntity tileentity = worldIn.getTileEntity(pos);
+
+        if (tileentity instanceof TileEntityPainter)
+        {
+            ItemStackHandler handler = ((TileEntityPainter) tileentity).inventory;
+            for (int i = 0; i < handler.getSlots(); ++i)
+            {
+                ItemStack itemstack = handler.getStackInSlot(i);
+
+                if (!itemstack.isEmpty())
+                {
+                    InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemstack);
+                    handler.setStackInSlot(i, ItemStack.EMPTY);
+                }
+            }
+        }
+        super.breakBlock(worldIn, pos, state);
     }
 }

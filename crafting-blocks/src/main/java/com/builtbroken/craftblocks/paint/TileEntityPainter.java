@@ -17,10 +17,12 @@ import java.util.List;
  */
 public class TileEntityPainter extends TileEntity implements ITickable
 {
-    public static final int INVENTORY_SIZE = 18;
+    public static final int INVENTORY_SIZE = 20;
     public static final int OUTPUT_SLOT = 0;
     public static final int POWER_SLOT = 1;
-    public static final int DYE_SLOT_START = 2;
+    public static final int INPUT_SLOT = 2;
+    public static final int BRUSH_SLOT = 3;
+    public static final int DYE_SLOT_START = 4;
 
     public static final String NBT_INVENTORY = "inventory";
 
@@ -33,10 +35,11 @@ public class TileEntityPainter extends TileEntity implements ITickable
         protected void onContentsChanged(int slot)
         {
             TileEntityPainter.this.markDirty();
+            TileEntityPainter.this.checkRecipe();
         }
     };
 
-    public PainterRecipe currentRecipe;
+    public int recipeIndex = 0;
 
     public boolean machineOn = false;
     public boolean canDoRecipe = false;
@@ -45,6 +48,8 @@ public class TileEntityPainter extends TileEntity implements ITickable
     @Override
     public void update()
     {
+        final PainterRecipe currentRecipe = getCurrentRecipe();
+
         //Only do logic server side, when machine is on, and if we have a worker for power
         if(!world.isRemote && machineOn && hasWorkerPower())
         {
@@ -55,15 +60,10 @@ public class TileEntityPainter extends TileEntity implements ITickable
                 if(!canDoRecipe && recipeTicks-- <= 0)
                 {
                     //Check if we can do recipe
-                    canDoRecipe = currentRecipe.hasRecipe(this);
+                    checkRecipe();
 
                     //If can do recipe set timer to recipe
-                    if(canDoRecipe)
-                    {
-                        recipeTicks = currentRecipe.ticksToComplete;
-                    }
-                    //if can't do recipe set timer to next check number
-                    else
+                    if(!canDoRecipe)
                     {
                         recipeTicks = 10;
                     }
@@ -87,14 +87,49 @@ public class TileEntityPainter extends TileEntity implements ITickable
         }
     }
 
+    protected void checkRecipe()
+    {
+        final PainterRecipe currentRecipe = getCurrentRecipe();
+        if(currentRecipe != null)
+        {
+            //Check if we can do recipe
+            canDoRecipe = currentRecipe.hasRecipe(this);
+
+            //If can do recipe set timer to recipe
+            if (canDoRecipe)
+            {
+                recipeTicks = currentRecipe.ticksToComplete;
+            }
+        }
+    }
+
+    public PainterRecipe getCurrentRecipe()
+    {
+        if(!recipes.isEmpty() && recipeIndex < recipes.size())
+        {
+            return recipes.get(recipeIndex);
+        }
+        return null;
+    }
+
     protected void consumeWorkerPower()
     {
-
+        //TODO implement
     }
 
     protected boolean hasWorkerPower()
     {
-        return true;
+        return true; //TODO implement
+    }
+
+    public int getBrushUses()
+    {
+        return 1; //TODO implement
+    }
+
+    public void useBrush(int uses)
+    {
+        //TODO implement
     }
 
     public int getDyeCount(EnumDyeColor enumDyeColor)

@@ -1,5 +1,8 @@
 package com.builtbroken.craftblocks;
 
+import com.builtbroken.craftblocks.paint.TileEntityPainter;
+import com.builtbroken.craftblocks.paint.gui.ContainerPainter;
+import com.builtbroken.craftblocks.paint.gui.GuiPainter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -21,6 +24,10 @@ public class GuiHandler implements IGuiHandler
         if (ID == 0)
         {
             TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+            if(tile instanceof TileEntityPainter)
+            {
+                return new ContainerPainter(player, (TileEntityPainter) tile);
+            }
         }
         return null;
     }
@@ -32,6 +39,10 @@ public class GuiHandler implements IGuiHandler
         if (ID == 0)
         {
             TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+            if(tile instanceof TileEntityPainter)
+            {
+                return new GuiPainter(player, (TileEntityPainter) tile);
+            }
         }
         return null;
     }

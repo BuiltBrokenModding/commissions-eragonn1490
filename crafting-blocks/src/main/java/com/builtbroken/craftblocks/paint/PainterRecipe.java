@@ -17,14 +17,24 @@ public class PainterRecipe
     /** Time to take to produce the item */
     public int ticksToComplete = 120;
 
+    /** How much durability to use of the brush item */
+    public int brushUses = 1;
+
     /** Dyes to use for the recipe */
     public Map<EnumDyeColor, Integer> dyeToUsage = new HashMap();
 
     /** Items to produce */
+    public final ItemStack input;
+
+    /** Items to produce */
     public final ItemStack output;
 
-    public PainterRecipe(ItemStack output, EnumDyeColor... dyes)
+    public final String unlocalizedName;
+
+    public PainterRecipe(String unlocalizedName, ItemStack input, ItemStack output, EnumDyeColor... dyes)
     {
+        this.unlocalizedName = unlocalizedName;
+        this.input = input;
         this.output = output;
         if (dyes != null)
         {
@@ -58,6 +68,19 @@ public class PainterRecipe
      */
     public boolean hasRecipe(TileEntityPainter painter)
     {
+        //Check that we have a brush
+        if(painter.getBrushUses() < brushUses)
+        {
+            return false;
+        }
+
+        //Check that we have expect input
+        ItemStack inputStack = painter.inventory.extractItem(TileEntityPainter.INPUT_SLOT, input.getCount(), true);
+        if(!isMatchingItem(inputStack, input))
+        {
+            return false;
+        }
+
         //Check if we have all dye required
         for (Map.Entry<EnumDyeColor, Integer> entry : dyeToUsage.entrySet())
         {
@@ -67,6 +90,7 @@ public class PainterRecipe
                 return false;
             }
         }
+
         //Check if we can output the item (simulated)
         return painter.inventory.insertItem(TileEntityPainter.OUTPUT_SLOT, output, true).isEmpty();
     }
@@ -82,6 +106,12 @@ public class PainterRecipe
     {
         if (hasRecipe(painter))
         {
+            //Consume brush uses
+            painter.useBrush(brushUses);
+
+            //Consume input
+            painter.inventory.extractItem(TileEntityPainter.INPUT_SLOT, input.getCount(), false);
+
             //Consume dye
             for (Map.Entry<EnumDyeColor, Integer> entry : dyeToUsage.entrySet())
             {
@@ -94,5 +124,10 @@ public class PainterRecipe
             return true;
         }
         return false;
+    }
+
+    protected boolean isMatchingItem(ItemStack inputStack, ItemStack expectedStack)
+    {
+        return !inputStack.isEmpty() && ItemStack.areItemsEqual(inputStack, expectedStack) && ItemStack.areItemStackTagsEqual(inputStack, expectedStack);
     }
 }
