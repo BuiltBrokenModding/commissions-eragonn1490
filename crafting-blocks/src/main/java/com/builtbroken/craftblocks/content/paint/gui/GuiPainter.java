@@ -3,6 +3,9 @@ package com.builtbroken.craftblocks.content.paint.gui;
 import com.builtbroken.craftblocks.CraftingBlocks;
 import com.builtbroken.craftblocks.content.paint.PainterRecipe;
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
+import com.builtbroken.craftblocks.network.MessageOnState;
+import com.builtbroken.craftblocks.network.MessagePainterRecipeToggle;
+import com.builtbroken.craftblocks.network.NetworkHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -36,11 +39,8 @@ public class GuiPainter extends GuiContainer
         super.initGui();
         this.buttonList.clear();
 
-        this.buttonList.add(onButton = new GuiButton(0, this.width / 2 - 82, this.height / 2 - 75, 20, 15, "On"));
-        onButton.enabled = !painter.machineOn;
-
-        this.buttonList.add(offButton = new GuiButton(1, this.width / 2 - 82, this.height / 2 - 60, 20, 15, "Off"));
-        offButton.enabled = painter.machineOn;
+        this.buttonList.add(onButton = new ButtonOnOff(0, this.width / 2 - 81, this.height / 2 - 75, true));
+        this.buttonList.add(offButton = new  ButtonOnOff(1, this.width / 2 - 81, this.height / 2 - 59, false));
 
         this.buttonList.add(new ButtonArrow(2, this.width / 2 - 54, this.height / 2 - 46, true));
         this.buttonList.add(new ButtonArrow(3, this.width / 2 + 54 - 19, this.height / 2 - 46, false));
@@ -49,29 +49,28 @@ public class GuiPainter extends GuiContainer
     @Override
     protected void actionPerformed(GuiButton par1GuiButton)
     {
-        initGui();
         int buttonID = par1GuiButton.id;
         if (buttonID == 0)
         {
             painter.machineOn = true;
             onButton.enabled = false;
             offButton.enabled = true;
-            //TODO send packet
+            NetworkHandler.sendToServer(new MessageOnState(painter, true));
         }
         else if (buttonID == 1)
         {
             painter.machineOn = false;
             onButton.enabled = true;
             offButton.enabled = false;
-            //TODO send packet
+            NetworkHandler.sendToServer(new MessageOnState(painter, false));
         }
         else if (buttonID == 2)
         {
-            //TODO send packet to switch recipe
+            NetworkHandler.sendToServer(new MessagePainterRecipeToggle(painter, false));
         }
         else if (buttonID == 3)
         {
-            //TODO send packet to switch recipe
+            NetworkHandler.sendToServer(new MessagePainterRecipeToggle(painter, true));
         }
     }
 
@@ -82,18 +81,23 @@ public class GuiPainter extends GuiContainer
         this.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
+
+        onButton.enabled = !painter.machineOn;
+        offButton.enabled = painter.machineOn;
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         //Display title
-        final String title = "Painter Bench";
+        final String title = "Painter Bench"; //TODO translate
         this.fontRenderer.drawString(title, this.xSize / 2 - this.fontRenderer.getStringWidth(title) / 2, 6, 4210752);
+
+        this.fontRenderer.drawString("" + painter.recipeTicks, this.xSize / 2 - this.fontRenderer.getStringWidth(title) / 2, -10, 4210752);
 
         //Display energy
         PainterRecipe recipe = painter.getCurrentRecipe();
-        final String recipeName = (recipe != null ? recipe.unlocalizedName : "none");
+        final String recipeName = (recipe != null ? recipe.unlocalizedName : "none"); //TODO translate
         this.fontRenderer.drawString(recipeName, this.xSize / 2 - this.fontRenderer.getStringWidth(recipeName) / 2, 37, Color.WHITE.getRGB());
     }
 

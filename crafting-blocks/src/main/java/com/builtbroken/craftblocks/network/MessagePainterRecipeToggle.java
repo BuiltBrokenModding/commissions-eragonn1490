@@ -10,57 +10,56 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
- * Created by Dark(DarkGuardsman, Robert) on 8/17/2018.
+ * Created by Dark(DarkGuardsman, Robert) on 8/18/2018.
  */
-public class MessageOnState extends MessageTile
+public class MessagePainterRecipeToggle extends MessageTile
 {
-    protected boolean onState;
+    protected boolean increase;
 
-    public MessageOnState()
+    public MessagePainterRecipeToggle()
     {
         //Empty for packet builder
     }
 
-    public MessageOnState(TileEntity tile, boolean onState)
+    public MessagePainterRecipeToggle(TileEntity tile, boolean increase)
     {
-        this(tile.getWorld().provider.getDimension(), tile.getPos(), onState);
+        this(tile.getWorld().provider.getDimension(), tile.getPos(), increase);
     }
 
-    public MessageOnState(int dim, BlockPos pos, boolean onState)
+    public MessagePainterRecipeToggle(int dim, BlockPos pos, boolean increase)
     {
         super(dim, pos);
-        this.onState = onState;
+        this.increase = increase;
     }
 
     @Override
     public void fromBytes(ByteBuf buf)
     {
         super.fromBytes(buf);
-        onState = buf.readBoolean();
+        increase = buf.readBoolean();
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
         super.toBytes(buf);
-        buf.writeBoolean(onState);
+        buf.writeBoolean(increase);
     }
 
-    public static class MessageHandler implements IMessageHandler<MessageOnState, MessageTile>
+    public static class MessageHandler implements IMessageHandler<MessagePainterRecipeToggle, MessageTile>
     {
         @Override
-        public MessageTile onMessage(MessageOnState message, MessageContext ctx)
+        public MessageTile onMessage(MessagePainterRecipeToggle message, MessageContext ctx)
         {
             World world = message.getWorld(ctx);
-            if (world != null && !world.isRemote && world.provider.getDimension() == message.dim)
+            if (world != null && world.provider.getDimension() == message.dim)
             {
                 if (world.isBlockLoaded(message.blockPos))
                 {
                     TileEntity tile = world.getTileEntity(message.blockPos);
                     if (tile instanceof TileEntityPainter)
                     {
-                       ((TileEntityPainter) tile).machineOn = message.onState;  //TODO fire with tick delay
-                       ((TileEntityPainter) tile).syncClient = true;
+                       ((TileEntityPainter) tile).toggleRecipe(message.increase); //TODO fire with tick delay
                     }
                 }
             }

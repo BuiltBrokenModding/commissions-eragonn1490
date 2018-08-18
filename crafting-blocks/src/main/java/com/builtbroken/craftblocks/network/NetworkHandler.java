@@ -18,8 +18,12 @@ public class NetworkHandler
     public static void init()
     {
         NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(CraftingBlocks.DOMAIN);
+        NETWORK.registerMessage(MessageOnState.MessageHandler.class, MessageOnState.class, 0, Side.SERVER);
         NETWORK.registerMessage(MessageOnState.MessageHandler.class, MessageOnState.class, 0, Side.CLIENT);
-        NETWORK.registerMessage(MessageDesc.MessageHandler.class, MessageDesc.class, 1, Side.CLIENT);
+        NETWORK.registerMessage(MessagePainterRecipeToggle.MessageHandler.class, MessagePainterRecipeToggle.class, 1, Side.SERVER);
+        NETWORK.registerMessage(MessagePainterRecipeToggle.MessageHandler.class, MessagePainterRecipeToggle.class, 1, Side.CLIENT);
+
+        NETWORK.registerMessage(MessageDesc.MessageHandler.class, MessageDesc.class, 2, Side.CLIENT);
     }
 
     public static void sendToAllAround(TileEntity tileEntity, IMessage message)
@@ -32,5 +36,10 @@ public class NetworkHandler
                         tileEntity.getPos().getZ(),
                         64
                 ));
+    }
+
+    public static void sendToServer(IMessage message)
+    {
+        NETWORK.sendToServer(message);
     }
 }

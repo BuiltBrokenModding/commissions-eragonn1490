@@ -1,6 +1,5 @@
 package com.builtbroken.craftblocks.network;
 
-import com.builtbroken.craftblocks.CraftingBlocks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -21,6 +20,13 @@ public class MessageDesc extends MessageTile
     public MessageDesc()
     {
         //Empty for packet builder
+    }
+
+    public MessageDesc(IDescMessageTile tile)
+    {
+        this.dim = ((TileEntity)tile).getWorld().provider.getDimension();
+        this.blockPos = ((TileEntity) tile).getPos();
+        this.tag = tile.writeDescMessage(new NBTTagCompound());
     }
 
     public MessageDesc(int dim, BlockPos pos, NBTTagCompound tag)
@@ -63,7 +69,7 @@ public class MessageDesc extends MessageTile
         @Override
         public MessageTile onMessage(MessageDesc message, MessageContext ctx)
         {
-            World world = CraftingBlocks.proxy.getLocalWorld();
+            World world = message.getWorld(ctx);
             if (world != null && world.provider.getDimension() == message.dim)
             {
                 if (world.isBlockLoaded(message.blockPos))

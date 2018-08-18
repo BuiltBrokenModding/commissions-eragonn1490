@@ -2,11 +2,15 @@ package com.builtbroken.craftblocks;
 
 import com.builtbroken.craftblocks.content.item.ItemCraftingTool;
 import com.builtbroken.craftblocks.content.paint.BlockPainter;
+import com.builtbroken.craftblocks.content.paint.PainterRecipe;
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import com.builtbroken.craftblocks.network.NetworkHandler;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModMetadata;
@@ -16,6 +20,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
 
@@ -43,6 +49,8 @@ public class CraftingBlocks
     @Mod.Metadata(DOMAIN)
     public static ModMetadata metadata;
 
+    public static Logger logger = LogManager.getLogger(DOMAIN);
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
@@ -54,6 +62,15 @@ public class CraftingBlocks
     public void init(FMLInitializationEvent event)
     {
         setModMetadata(DOMAIN, "Crafting Block Mod", metadata);
+
+        for (EnumDyeColor enumDyeColor : EnumDyeColor.values())
+        {
+            TileEntityPainter.registerRecipe(new PainterRecipe("wool." + enumDyeColor.getUnlocalizedName(),
+                    new ItemStack(Blocks.WOOL, 1, EnumDyeColor.WHITE.getMetadata()),
+                    new ItemStack(Blocks.WOOL, 1, enumDyeColor.getMetadata()),
+                    enumDyeColor
+                    ).setRegistryName(PREFIX + "wool." + enumDyeColor.getName()));
+        }
     }
 
     @SubscribeEvent

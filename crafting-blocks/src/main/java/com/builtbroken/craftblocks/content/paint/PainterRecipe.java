@@ -2,6 +2,7 @@ package com.builtbroken.craftblocks.content.paint;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 8/17/2018.
  */
-public class PainterRecipe
+public class PainterRecipe extends IForgeRegistryEntry.Impl<PainterRecipe>
 {
     /** Time to take to produce the item */
     public int ticksToComplete = 120;
@@ -30,6 +31,8 @@ public class PainterRecipe
     public final ItemStack output;
 
     public final String unlocalizedName;
+
+    public int index = -1;
 
     public PainterRecipe(String unlocalizedName, ItemStack input, ItemStack output, EnumDyeColor... dyes)
     {
@@ -69,14 +72,14 @@ public class PainterRecipe
     public boolean hasRecipe(TileEntityPainter painter)
     {
         //Check that we have a brush
-        if(painter.getBrushUses() < brushUses)
+        if (painter.getBrushUses() < brushUses)
         {
             return false;
         }
 
         //Check that we have expect input
         ItemStack inputStack = painter.inventory.extractItem(TileEntityPainter.INPUT_SLOT, input.getCount(), true);
-        if(!isMatchingItem(inputStack, input))
+        if (!isMatchingItem(inputStack, input))
         {
             return false;
         }
@@ -129,5 +132,10 @@ public class PainterRecipe
     protected boolean isMatchingItem(ItemStack inputStack, ItemStack expectedStack)
     {
         return !inputStack.isEmpty() && ItemStack.areItemsEqual(inputStack, expectedStack) && ItemStack.areItemStackTagsEqual(inputStack, expectedStack);
+    }
+
+    public String toString()
+    {
+        return "PainterRecipe(" + unlocalizedName + "," + (getRegistryName() != null ? getRegistryName().toString() : "null") + ")";
     }
 }
