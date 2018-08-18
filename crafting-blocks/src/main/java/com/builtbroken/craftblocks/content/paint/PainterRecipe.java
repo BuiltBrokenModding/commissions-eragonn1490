@@ -129,7 +129,7 @@ public class PainterRecipe extends IForgeRegistryEntry.Impl<PainterRecipe>
         return false;
     }
 
-    protected boolean isMatchingItem(ItemStack inputStack, ItemStack expectedStack)
+    public boolean isMatchingItem(ItemStack inputStack, ItemStack expectedStack)
     {
         return !inputStack.isEmpty() && ItemStack.areItemsEqual(inputStack, expectedStack) && ItemStack.areItemStackTagsEqual(inputStack, expectedStack);
     }

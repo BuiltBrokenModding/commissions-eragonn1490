@@ -1,9 +1,13 @@
 package com.builtbroken.craftblocks.content.paint.gui;
 
+import com.builtbroken.craftblocks.CraftingBlocks;
+import com.builtbroken.craftblocks.content.paint.PainterRecipe;
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -18,18 +22,23 @@ public class ContainerPainter extends Container
     public ContainerPainter(EntityPlayer player, TileEntityPainter painter)
     {
         this.painter = painter;
-        this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.INPUT_SLOT, 35, 19));
-        this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.BRUSH_SLOT, 35 + 18, 19));
+        //Add slots, order does matter for shift click to work
         this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.OUTPUT_SLOT, 106, 19));
         this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.POWER_SLOT, 143, 19));
+        this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.INPUT_SLOT, 35, 19));
+        this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.BRUSH_SLOT, 35 + 18, 19));
 
+        //Create dye slots
+        //--Run first so slot order is maintained for shift click
         for (int i = 0; i < 9; ++i)
         {
             this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.DYE_SLOT_START + i, 8 + i * 18, 47));
-            if(i > 0 && i < 8)
-            {
-                this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.DYE_SLOT_START + 8 +  i, 8 + i * 18, 47 + 18));
-            }
+        }
+
+        //--Run second so slot order is maintained for shift click
+        for (int i = 1; i < 8; ++i)
+        {
+            this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.DYE_SLOT_START + 8 + i, 8 + i * 18, 47 + 18));
         }
 
         //Add player inventory
@@ -53,8 +62,20 @@ public class ContainerPainter extends Container
         return playerIn.getDistanceSqToCenter(painter.getPos()) <= 100;
     }
 
-    protected boolean isValidItemForInventory(ItemStack stack)
+    protected boolean isDyeItem(ItemStack stack)
     {
+        return stack.getItem() == Items.DYE;
+    }
+
+    protected boolean isRecipeInput(ItemStack stack)
+    {
+        for(PainterRecipe recipe : TileEntityPainter.recipes)
+        {
+            if(recipe != null && recipe.isMatchingItem(stack, recipe.input))
+            {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -87,9 +108,24 @@ public class ContainerPainter extends Container
             }
             else if (index >= playerStart)
             {
-                if (isValidItemForInventory(itemstack1))
+                if (itemstack1.getItem() == CraftingBlocks.itemPaintBrush)
                 {
-                    if (!this.mergeItemStack(itemstack1, invStart, invEnd, false))
+                    if (!this.mergeItemStack(itemstack1, TileEntityPainter.BRUSH_SLOT, TileEntityPainter.BRUSH_SLOT + 1, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                else if (isRecipeInput(itemstack1))
+                {
+                    if (!this.mergeItemStack(itemstack1, TileEntityPainter.INPUT_SLOT, TileEntityPainter.INPUT_SLOT + 1, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                else if(isDyeItem(itemstack1))
+                {
+                    int dyeSlot = painter.getDyeSlot(EnumDyeColor.byDyeDamage(itemstack1.getItemDamage()));
+                    if (!this.mergeItemStack(itemstack1, dyeSlot, dyeSlot + 1, false))
                     {
                         return ItemStack.EMPTY;
                     }
