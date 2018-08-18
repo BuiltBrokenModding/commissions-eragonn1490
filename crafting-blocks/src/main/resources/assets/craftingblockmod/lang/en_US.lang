@@ -1,1 +1,3 @@
 tile.craftingblockmod:painter.name=Painter Bench
+
+item.craftingblockmod:brush.name=Paint Brush

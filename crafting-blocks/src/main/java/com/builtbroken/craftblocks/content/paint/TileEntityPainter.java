@@ -181,12 +181,28 @@ public class TileEntityPainter extends TileEntity implements ITickable, IDescMes
 
     public int getBrushUses()
     {
-        return 1; //TODO implement
+        ItemStack stack = inventory.getStackInSlot(BRUSH_SLOT);
+        if(stack.getItem() == CraftingBlocks.itemPaintBrush)
+        {
+            return CraftingBlocks.itemPaintBrush.getUsesLeft(stack);
+        }
+        return 0;
     }
 
     public void useBrush(int uses)
     {
-        //TODO implement
+        ItemStack stack = inventory.getStackInSlot(BRUSH_SLOT);
+        if(stack.getItem() == CraftingBlocks.itemPaintBrush)
+        {
+            if(CraftingBlocks.itemPaintBrush.consumeUse(stack, uses))
+            {
+                inventory.setStackInSlot(BRUSH_SLOT, ItemStack.EMPTY);
+            }
+            else
+            {
+                inventory.setStackInSlot(BRUSH_SLOT, stack);
+            }
+        }
     }
 
     public int getDyeCount(EnumDyeColor enumDyeColor)

@@ -40,8 +40,8 @@ public class CraftingBlocks
 
     public static Item itemBlockPainter;
 
-    public static Item itemPaintBrush;
-    public static Item itemStoneChisel;
+    public static ItemCraftingTool itemPaintBrush;
+    public static ItemCraftingTool itemStoneChisel;
 
     @SidedProxy(clientSide = "com.builtbroken.craftblocks.client.ClientProxy", serverSide = "com.builtbroken.craftblocks.CommonProxy")
     public static CommonProxy proxy;
