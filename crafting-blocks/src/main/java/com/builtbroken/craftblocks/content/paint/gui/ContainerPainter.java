@@ -1,6 +1,6 @@
-package com.builtbroken.craftblocks.paint.gui;
+package com.builtbroken.craftblocks.content.paint.gui;
 
-import com.builtbroken.craftblocks.paint.TileEntityPainter;
+import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -25,10 +25,10 @@ public class ContainerPainter extends Container
 
         for (int i = 0; i < 9; ++i)
         {
-            this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.DYE_SLOT_START + i, 8 + i * 18, 46));
+            this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.DYE_SLOT_START + i, 8 + i * 18, 47));
             if(i > 0 && i < 8)
             {
-                this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.DYE_SLOT_START + 8 +  i, 8 + i * 18, 46 + 18));
+                this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.DYE_SLOT_START + 8 +  i, 8 + i * 18, 47 + 18));
             }
         }
 

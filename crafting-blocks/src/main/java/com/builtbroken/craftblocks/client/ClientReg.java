@@ -1,5 +1,6 @@
-package com.builtbroken.craftblocks;
+package com.builtbroken.craftblocks.client;
 
+import com.builtbroken.craftblocks.CraftingBlocks;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;

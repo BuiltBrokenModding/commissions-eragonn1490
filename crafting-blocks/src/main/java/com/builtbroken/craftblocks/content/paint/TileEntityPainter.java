@@ -1,4 +1,4 @@
-package com.builtbroken.craftblocks.paint;
+package com.builtbroken.craftblocks.content.paint;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
@@ -165,19 +165,9 @@ public class TileEntityPainter extends TileEntity implements ITickable
                 && stack.getItemDamage() == enumDyeColor.getDyeDamage();
     }
 
-    public boolean hasDye(EnumDyeColor enumDyeColor)
-    {
-        return getDyeCount(enumDyeColor) > 0;
-    }
-
     public int getDyeSlot(EnumDyeColor enumDyeColor)
     {
         return DYE_SLOT_START + enumDyeColor.ordinal();
-    }
-
-    public ItemStack getStackInOutput()
-    {
-        return inventory.getStackInSlot(OUTPUT_SLOT);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.builtbroken.craftblocks.paint;
+package com.builtbroken.craftblocks.content.paint;
 
 import com.builtbroken.craftblocks.CraftingBlocks;
 import net.minecraft.block.Block;

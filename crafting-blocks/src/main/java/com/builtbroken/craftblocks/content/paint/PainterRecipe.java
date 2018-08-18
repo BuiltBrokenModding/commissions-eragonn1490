@@ -1,4 +1,4 @@
-package com.builtbroken.craftblocks.paint;
+package com.builtbroken.craftblocks.content.paint;
 
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;

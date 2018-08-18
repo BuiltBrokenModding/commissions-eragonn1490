@@ -1,12 +1,15 @@
-package com.builtbroken.craftblocks.paint.gui;
+package com.builtbroken.craftblocks.content.paint.gui;
 
 import com.builtbroken.craftblocks.CraftingBlocks;
-import com.builtbroken.craftblocks.paint.TileEntityPainter;
+import com.builtbroken.craftblocks.content.paint.PainterRecipe;
+import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+
+import java.awt.*;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -14,7 +17,7 @@ import net.minecraft.util.ResourceLocation;
  */
 public class GuiPainter extends GuiContainer
 {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(CraftingBlocks.DOMAIN, "textures/gui/painter.png");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(CraftingBlocks.DOMAIN, "textures/gui/painter.png");
 
     private final TileEntityPainter painter;
 
@@ -31,6 +34,7 @@ public class GuiPainter extends GuiContainer
     public void initGui()
     {
         super.initGui();
+        this.buttonList.clear();
 
         this.buttonList.add(onButton = new GuiButton(0, this.width / 2 - 82, this.height / 2 - 75, 20, 15, "On"));
         onButton.enabled = !painter.machineOn;
@@ -38,13 +42,14 @@ public class GuiPainter extends GuiContainer
         this.buttonList.add(offButton = new GuiButton(1, this.width / 2 - 82, this.height / 2 - 60, 20, 15, "Off"));
         offButton.enabled = painter.machineOn;
 
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 83, this.height / 2 - 20, 20, 20, "<<"));
-        this.buttonList.add(new GuiButton(3, this.width / 2 + 83 - 20, this.height / 2 - 20, 20, 20, ">>"));
+        this.buttonList.add(new ButtonArrow(2, this.width / 2 - 54, this.height / 2 - 46, true));
+        this.buttonList.add(new ButtonArrow(3, this.width / 2 + 54 - 19, this.height / 2 - 46, false));
     }
 
     @Override
     protected void actionPerformed(GuiButton par1GuiButton)
     {
+        initGui();
         int buttonID = par1GuiButton.id;
         if (buttonID == 0)
         {
@@ -83,12 +88,13 @@ public class GuiPainter extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         //Display title
-        final String title = "Energy Storage Block";
+        final String title = "Painter Bench";
         this.fontRenderer.drawString(title, this.xSize / 2 - this.fontRenderer.getStringWidth(title) / 2, 6, 4210752);
 
         //Display energy
-        final String recipeName = "painting x3";
-        this.fontRenderer.drawString(recipeName, this.xSize / 2 - this.fontRenderer.getStringWidth(recipeName) / 2, 36, 4210752);
+        PainterRecipe recipe = painter.getCurrentRecipe();
+        final String recipeName = (recipe != null ? recipe.unlocalizedName : "none");
+        this.fontRenderer.drawString(recipeName, this.xSize / 2 - this.fontRenderer.getStringWidth(recipeName) / 2, 37, Color.WHITE.getRGB());
     }
 
     @Override
