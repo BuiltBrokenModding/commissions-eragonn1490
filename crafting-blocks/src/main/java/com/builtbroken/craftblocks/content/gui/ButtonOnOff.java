@@ -1,4 +1,4 @@
-package com.builtbroken.craftblocks.content.paint.gui;
+package com.builtbroken.craftblocks.content.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -8,21 +8,19 @@ import net.minecraft.client.renderer.GlStateManager;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 8/18/2018.
  */
-public class ButtonArrow extends GuiButton
+public class ButtonOnOff extends GuiButton
 {
     public static final int textureX = 176 + 18 + 18;
-    public static final int textureY = 28;
-    public static final int arrowX = 176;
-    public static final int arrowY = 20;
+    public static final int textureY = 39;
 
-    public final boolean left;
+    public final boolean onState;
 
-    public ButtonArrow(int buttonId, int x, int y, boolean left)
+    public ButtonOnOff(int buttonId, int x, int y, boolean onState)
     {
-        super(buttonId, x, y, "");
-        this.left = left;
+        super(buttonId, x, y, onState ? "O" : "I");
+        this.onState = onState;
         this.width = 18;
-        this.height = 8;
+        this.height = 15;
     }
 
     @Override
@@ -46,11 +44,27 @@ public class ButtonArrow extends GuiButton
             //Draw body
             this.drawTexturedModalRect(this.x, this.y, textureX - width * hoverIndex, textureY, this.width, this.height);
 
-            //Draw arrow
-            this.drawTexturedModalRect(this.x, this.y, arrowX + (left ? 0 : width), arrowY, this.width, this.height);
-
             //Trigger mouse drag
             this.mouseDragged(mc, mouseX, mouseY);
+
+            //Draw text
+            int j = 14737632;
+
+            if (packedFGColour != 0)
+            {
+                j = packedFGColour;
+            }
+            else
+            if (!this.enabled)
+            {
+                j = 10526880;
+            }
+            else if (this.hovered)
+            {
+                j = 16777120;
+            }
+
+            this.drawCenteredString(mc.fontRenderer, this.displayString, this.x + this.width / 2, this.y + 4, j);
         }
     }
 }

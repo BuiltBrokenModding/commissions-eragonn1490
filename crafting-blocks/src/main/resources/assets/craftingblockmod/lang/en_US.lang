@@ -1,3 +1,8 @@
 tile.craftingblockmod:painter.name=Painter Bench
 
 item.craftingblockmod:brush.name=Paint Brush
+
+item.craftingblockmod:power.default.name=Basic Worker
+item.craftingblockmod:power.librarian.name=Librarian Worker
+item.craftingblockmod:power.painter.name=Painter Worker
+item.craftingblockmod:power.craftsman.name=Craftsman Worker

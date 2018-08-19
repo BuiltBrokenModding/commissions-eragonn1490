@@ -72,7 +72,7 @@ public class PainterRecipe extends IForgeRegistryEntry.Impl<PainterRecipe>
     public boolean hasRecipe(TileEntityPainter painter)
     {
         //Check that we have a brush
-        if (painter.getBrushUses() < brushUses)
+        if (painter.getToolUses() < brushUses)
         {
             return false;
         }
@@ -110,7 +110,7 @@ public class PainterRecipe extends IForgeRegistryEntry.Impl<PainterRecipe>
         if (hasRecipe(painter))
         {
             //Consume brush uses
-            painter.useBrush(brushUses);
+            painter.useTool(brushUses);
 
             //Consume input
             painter.inventory.extractItem(TileEntityPainter.INPUT_SLOT, input.getCount(), false);

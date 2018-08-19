@@ -1,14 +1,13 @@
 package com.builtbroken.craftblocks.content.paint;
 
 import com.builtbroken.craftblocks.CraftingBlocks;
+import com.builtbroken.craftblocks.content.TileEntityCrafter;
 import com.builtbroken.craftblocks.network.IDescMessageTile;
 import com.builtbroken.craftblocks.network.MessageDesc;
 import com.builtbroken.craftblocks.network.NetworkHandler;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.ItemStackHandler;
@@ -22,19 +21,10 @@ import java.util.Map;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 8/15/2018.
  */
-public class TileEntityPainter extends TileEntity implements ITickable, IDescMessageTile
+public class TileEntityPainter extends TileEntityCrafter implements ITickable, IDescMessageTile
 {
     public static final int INVENTORY_SIZE = 20;
-    public static final int OUTPUT_SLOT = 0;
-    public static final int POWER_SLOT = 1;
-    public static final int INPUT_SLOT = 2;
-    public static final int BRUSH_SLOT = 3;
     public static final int DYE_SLOT_START = 4;
-
-    public static final String NBT_INVENTORY = "inventory";
-    public static final String NBT_ON_STATE = "machine_on";
-    public static final String NBT_RECIPE_NAME = "recipe_name";
-    public static final String NBT_RECIPE_TICKS = "recipe_ticks";
 
     //recipe.painting.mod:item.name
     public static final String RECIPE_UNLOCALIZATION_PREFX = "recipe.painting";
@@ -53,13 +43,6 @@ public class TileEntityPainter extends TileEntity implements ITickable, IDescMes
         }
     };
 
-    public int recipeIndex = 0;
-
-    public boolean machineOn = false;
-    public boolean canDoRecipe = false;
-    public boolean syncClient = false;
-
-    public int recipeTicks;
 
     @Override
     public void update()
@@ -67,10 +50,10 @@ public class TileEntityPainter extends TileEntity implements ITickable, IDescMes
         final PainterRecipe currentRecipe = getCurrentRecipe();
 
         //Only do logic server side,
-        if (!world.isRemote )
+        if (!world.isRemote)
         {
             //Only run logic when machine is on, and if we have a worker for power
-            if(machineOn && hasWorkerPower())
+            if (machineOn && hasWorkerPower())
             {
                 //Only do logic if a recipe is active
                 if (currentRecipe != null)
@@ -105,7 +88,7 @@ public class TileEntityPainter extends TileEntity implements ITickable, IDescMes
                 }
             }
 
-            if(syncClient)
+            if (syncClient)
             {
                 syncClient = false;
             }
@@ -137,72 +120,6 @@ public class TileEntityPainter extends TileEntity implements ITickable, IDescMes
             return recipes.get(recipeIndex);
         }
         return null;
-    }
-
-    public void toggleRecipe(boolean next)
-    {
-        //Cycle index
-        if (next)
-        {
-            recipeIndex++;
-        }
-        else
-        {
-            recipeIndex--;
-        }
-
-        //Clamp index
-        if (recipeIndex >= recipes.size())
-        {
-            recipeIndex = -1;
-        }
-        else if (recipeIndex < -1)
-        {
-            recipeIndex = recipes.size() - 1;
-        }
-
-        //Schedule packet
-        syncClient = true;
-
-        //Reset recipe
-        canDoRecipe = false;
-        recipeTicks = 10;
-    }
-
-    protected void consumeWorkerPower()
-    {
-        //TODO implement
-    }
-
-    protected boolean hasWorkerPower()
-    {
-        return true; //TODO implement
-    }
-
-    public int getBrushUses()
-    {
-        ItemStack stack = inventory.getStackInSlot(BRUSH_SLOT);
-        if(stack.getItem() == CraftingBlocks.itemPaintBrush)
-        {
-            return CraftingBlocks.itemPaintBrush.getUsesLeft(stack);
-        }
-        return 0;
-    }
-
-    public void useBrush(int uses)
-    {
-        ItemStack stack = inventory.getStackInSlot(BRUSH_SLOT);
-        if(stack.getItem() == CraftingBlocks.itemPaintBrush)
-        {
-            if(CraftingBlocks.itemPaintBrush.consumeUse(stack, uses))
-            {
-                inventory.setStackInSlot(BRUSH_SLOT, ItemStack.EMPTY);
-            }
-            else
-            {
-                inventory.setStackInSlot(BRUSH_SLOT, stack);
-            }
-        }
     }
 
     public int getDyeCount(EnumDyeColor enumDyeColor)
@@ -244,58 +161,37 @@ public class TileEntityPainter extends TileEntity implements ITickable, IDescMes
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound)
+    public ItemStackHandler getInventory()
     {
-        super.readFromNBT(compound);
-        inventory.deserializeNBT(compound.getCompoundTag(NBT_INVENTORY));
-        readDescMessage(compound);
+        return inventory;
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    public String getRecipeName()
     {
-        compound.setTag(NBT_INVENTORY, inventory.serializeNBT());
-        return super.writeToNBT(writeDescMessage(compound));
+        return getCurrentRecipe() != null ? getCurrentRecipe().getRegistryName().toString() : "none";
     }
 
     @Override
-    public NBTTagCompound writeDescMessage(NBTTagCompound tagCompound)
+    public int getIndexForRecipe(ResourceLocation location)
     {
-        tagCompound.setInteger(NBT_RECIPE_TICKS, recipeTicks);
-        tagCompound.setBoolean(NBT_ON_STATE, machineOn);
-        tagCompound.setString(NBT_RECIPE_NAME, getCurrentRecipe() != null ? getCurrentRecipe().getRegistryName().toString() : "none");
-        return tagCompound;
-    }
-
-    @Override
-    public void readDescMessage(NBTTagCompound tagCompound)
-    {
-        recipeTicks = tagCompound.getInteger(NBT_RECIPE_TICKS);
-        machineOn = tagCompound.getBoolean(NBT_ON_STATE);
-        String recipeName = tagCompound.getString(NBT_RECIPE_NAME);
-        if (recipeName.equalsIgnoreCase("none"))
+        PainterRecipe recipe = nameToRecipe.get(location);
+        if(recipe != null)
         {
-            recipeIndex = -1;
+            return recipe.index;
         }
-        else
-        {
-            ResourceLocation location = new ResourceLocation(recipeName);
-            PainterRecipe recipe = nameToRecipe.get(location);
-            if (recipe != null)
-            {
-                recipeIndex = recipe.index;
-            }
-            else
-            {
-                CraftingBlocks.logger.error("TileEntityPainter#readDescMessage(nbt) -> Error: Could not find a recipe with name '" + recipeName + "'", new RuntimeException());
-                recipeIndex = -1;
-            }
-        }
+        return -1;
+    }
+
+    @Override
+    public int getRecipeCount()
+    {
+        return recipes.size();
     }
 
     public static void registerRecipe(PainterRecipe recipe)
     {
-        if(recipe.getRegistryName() == null)
+        if (recipe.getRegistryName() == null)
         {
             throw new RuntimeException("TileEntityPainter#registerRecipe(recipe) recipe needs to have a registry name");
         }

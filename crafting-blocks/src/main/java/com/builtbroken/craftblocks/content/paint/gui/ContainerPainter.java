@@ -1,6 +1,7 @@
 package com.builtbroken.craftblocks.content.paint.gui;
 
 import com.builtbroken.craftblocks.CraftingBlocks;
+import com.builtbroken.craftblocks.content.item.ItemCraftingPower;
 import com.builtbroken.craftblocks.content.paint.PainterRecipe;
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,7 +27,7 @@ public class ContainerPainter extends Container
         this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.OUTPUT_SLOT, 106, 19));
         this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.POWER_SLOT, 143, 19));
         this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.INPUT_SLOT, 35, 19));
-        this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.BRUSH_SLOT, 35 + 18, 19));
+        this.addSlotToContainer(new SlotItemHandler(painter.inventory, TileEntityPainter.TOOL_SLOT, 35 + 18, 19));
 
         //Create dye slots
         //--Run first so slot order is maintained for shift click
@@ -110,7 +111,14 @@ public class ContainerPainter extends Container
             {
                 if (itemstack1.getItem() == CraftingBlocks.itemPaintBrush)
                 {
-                    if (!this.mergeItemStack(itemstack1, TileEntityPainter.BRUSH_SLOT, TileEntityPainter.BRUSH_SLOT + 1, false))
+                    if (!this.mergeItemStack(itemstack1, TileEntityPainter.TOOL_SLOT, TileEntityPainter.TOOL_SLOT + 1, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                else if (itemstack1.getItem() instanceof ItemCraftingPower)
+                {
+                    if (!this.mergeItemStack(itemstack1, TileEntityPainter.POWER_SLOT, TileEntityPainter.POWER_SLOT + 1, false))
                     {
                         return ItemStack.EMPTY;
                     }

@@ -1,5 +1,6 @@
 package com.builtbroken.craftblocks;
 
+import com.builtbroken.craftblocks.content.item.ItemCraftingPower;
 import com.builtbroken.craftblocks.content.item.ItemCraftingTool;
 import com.builtbroken.craftblocks.content.paint.BlockPainter;
 import com.builtbroken.craftblocks.content.paint.PainterRecipe;
@@ -43,6 +44,11 @@ public class CraftingBlocks
     public static ItemCraftingTool itemPaintBrush;
     public static ItemCraftingTool itemStoneChisel;
 
+    public static ItemCraftingPower itemCrafterPower;
+    public static ItemCraftingPower itemCrafterPowerLibrarian;
+    public static ItemCraftingPower itemCrafterPowerPainter;
+    public static ItemCraftingPower itemCrafterPowerCraftsman;
+
     @SidedProxy(clientSide = "com.builtbroken.craftblocks.client.ClientProxy", serverSide = "com.builtbroken.craftblocks.CommonProxy")
     public static CommonProxy proxy;
 
@@ -80,6 +86,11 @@ public class CraftingBlocks
 
         event.getRegistry().register(itemPaintBrush = new ItemCraftingTool("brush", 100));
         event.getRegistry().register(itemStoneChisel = new ItemCraftingTool("chisel", 100));
+
+        event.getRegistry().register(itemCrafterPower = new ItemCraftingPower("power_default", 10));
+        event.getRegistry().register(itemCrafterPowerLibrarian = new ItemCraftingPower("power_librarian", 30));
+        event.getRegistry().register(itemCrafterPowerPainter = new ItemCraftingPower("power_painter", 100));
+        event.getRegistry().register(itemCrafterPowerCraftsman = new ItemCraftingPower("power_craftsman", 100));
     }
 
     @SubscribeEvent

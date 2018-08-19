@@ -1,6 +1,8 @@
 package com.builtbroken.craftblocks.content.paint.gui;
 
 import com.builtbroken.craftblocks.CraftingBlocks;
+import com.builtbroken.craftblocks.content.gui.ButtonArrow;
+import com.builtbroken.craftblocks.content.gui.ButtonOnOff;
 import com.builtbroken.craftblocks.content.paint.PainterRecipe;
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import com.builtbroken.craftblocks.network.MessageOnState;
@@ -40,7 +42,7 @@ public class GuiPainter extends GuiContainer
         this.buttonList.clear();
 
         this.buttonList.add(onButton = new ButtonOnOff(0, this.width / 2 - 81, this.height / 2 - 75, true));
-        this.buttonList.add(offButton = new  ButtonOnOff(1, this.width / 2 - 81, this.height / 2 - 59, false));
+        this.buttonList.add(offButton = new ButtonOnOff(1, this.width / 2 - 81, this.height / 2 - 59, false));
 
         this.buttonList.add(new ButtonArrow(2, this.width / 2 - 54, this.height / 2 - 46, true));
         this.buttonList.add(new ButtonArrow(3, this.width / 2 + 54 - 19, this.height / 2 - 46, false));
@@ -93,9 +95,7 @@ public class GuiPainter extends GuiContainer
         final String title = "Painter Bench"; //TODO translate
         this.fontRenderer.drawString(title, this.xSize / 2 - this.fontRenderer.getStringWidth(title) / 2, 6, 4210752);
 
-        this.fontRenderer.drawString("" + painter.recipeTicks, this.xSize / 2 - this.fontRenderer.getStringWidth(title) / 2, -10, 4210752);
-
-        //Display energy
+        //Display recipe
         PainterRecipe recipe = painter.getCurrentRecipe();
         final String recipeName = (recipe != null ? recipe.unlocalizedName : "none"); //TODO translate
         this.fontRenderer.drawString(recipeName, this.xSize / 2 - this.fontRenderer.getStringWidth(recipeName) / 2, 37, Color.WHITE.getRGB());
@@ -104,11 +104,25 @@ public class GuiPainter extends GuiContainer
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
+        final int left = (this.width - this.xSize) / 2;
+        final int top = (this.height - this.ySize) / 2;
+
         //Draw background
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(TEXTURE);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+
+        this.drawTexturedModalRect(left, top, 0, 0, this.xSize, this.ySize);
+
+        //Draw progress arrow
+        PainterRecipe recipe = painter.getCurrentRecipe();
+        if (recipe != null && painter.canDoRecipe)
+        {
+            float p = (float) painter.recipeTicks / (float) painter.getCurrentRecipe().ticksToComplete;
+            int width = 22 - (int) Math.ceil(22 * p);
+            if (width > 0)
+            {
+                this.drawTexturedModalRect(left + 76, top + 20, 177, 0, width, 16);
+            }
+        }
     }
 }

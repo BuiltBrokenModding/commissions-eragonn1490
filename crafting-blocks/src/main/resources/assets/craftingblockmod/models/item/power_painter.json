@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "craftingblockmod:items/crafting_power_painter"
+    }
+}
