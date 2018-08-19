@@ -1,5 +1,6 @@
 package com.builtbroken.craftblocks.content.gui;
 
+import com.builtbroken.craftblocks.content.paint.gui.GuiPainter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;

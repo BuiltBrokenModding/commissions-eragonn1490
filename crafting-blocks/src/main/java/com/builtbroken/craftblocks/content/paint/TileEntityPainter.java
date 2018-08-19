@@ -2,13 +2,9 @@ package com.builtbroken.craftblocks.content.paint;
 
 import com.builtbroken.craftblocks.CraftingBlocks;
 import com.builtbroken.craftblocks.content.TileEntityCrafter;
-import com.builtbroken.craftblocks.network.IDescMessageTile;
-import com.builtbroken.craftblocks.network.MessageDesc;
-import com.builtbroken.craftblocks.network.NetworkHandler;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -21,7 +17,7 @@ import java.util.Map;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 8/15/2018.
  */
-public class TileEntityPainter extends TileEntityCrafter implements ITickable, IDescMessageTile
+public class TileEntityPainter extends TileEntityCrafter<PainterRecipe>
 {
     public static final int INVENTORY_SIZE = 20;
     public static final int DYE_SLOT_START = 4;
@@ -43,76 +39,7 @@ public class TileEntityPainter extends TileEntityCrafter implements ITickable, I
         }
     };
 
-
     @Override
-    public void update()
-    {
-        final PainterRecipe currentRecipe = getCurrentRecipe();
-
-        //Only do logic server side,
-        if (!world.isRemote)
-        {
-            //Only run logic when machine is on, and if we have a worker for power
-            if (machineOn && hasWorkerPower())
-            {
-                //Only do logic if a recipe is active
-                if (currentRecipe != null)
-                {
-                    //If no recipe try to find one (delay to avoid wasting CPU time)
-                    if (!canDoRecipe && recipeTicks-- <= 0)
-                    {
-                        //Check if we can do recipe
-                        checkRecipe();
-
-                        //If can do recipe set timer to recipe
-                        if (!canDoRecipe)
-                        {
-                            recipeTicks = 10;
-                        }
-                    }
-
-                    //Check if we can do recipe
-                    if (canDoRecipe && recipeTicks-- <= 0)
-                    {
-                        //Do recipe
-                        if (currentRecipe.doRecipe(this))
-                        {
-                            //Consume power
-                            consumeWorkerPower();
-                        }
-                        else
-                        {
-                            recipeTicks++; //keeps ticks from under flowing
-                        }
-                    }
-                }
-            }
-
-            if (syncClient)
-            {
-                syncClient = false;
-            }
-
-            NetworkHandler.sendToAllAround(this, new MessageDesc(this));
-        }
-    }
-
-    protected void checkRecipe()
-    {
-        final PainterRecipe currentRecipe = getCurrentRecipe();
-        if (currentRecipe != null)
-        {
-            //Check if we can do recipe
-            canDoRecipe = currentRecipe.hasRecipe(this);
-
-            //If can do recipe set timer to recipe
-            if (canDoRecipe)
-            {
-                recipeTicks = currentRecipe.ticksToComplete;
-            }
-        }
-    }
-
     public PainterRecipe getCurrentRecipe()
     {
         if (!recipes.isEmpty() && recipeIndex < recipes.size() && recipeIndex >= 0)
@@ -181,6 +108,12 @@ public class TileEntityPainter extends TileEntityCrafter implements ITickable, I
             return recipe.index;
         }
         return -1;
+    }
+
+    @Override
+    public boolean isTool(ItemStack stack)
+    {
+        return stack.getItem() == CraftingBlocks.itemPaintBrush;
     }
 
     @Override
