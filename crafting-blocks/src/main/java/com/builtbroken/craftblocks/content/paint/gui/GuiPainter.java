@@ -11,6 +11,7 @@ import com.builtbroken.craftblocks.network.NetworkHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
@@ -92,12 +93,12 @@ public class GuiPainter extends GuiContainer
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         //Display title
-        final String title = "Painter Bench"; //TODO translate
+        final String title = I18n.format(CraftingBlocks.blockPainter.getUnlocalizedName() + ".name");
         this.fontRenderer.drawString(title, this.xSize / 2 - this.fontRenderer.getStringWidth(title) / 2, 6, 4210752);
 
         //Display recipe
         PainterRecipe recipe = painter.getCurrentRecipe();
-        final String recipeName = (recipe != null ? recipe.unlocalizedName : "none"); //TODO translate
+        final String recipeName = I18n.format((recipe != null ? recipe.unlocalizedName : (CraftingBlocks.blockPainter.getUnlocalizedName() + ".recipe.none")));
         this.fontRenderer.drawString(recipeName, this.xSize / 2 - this.fontRenderer.getStringWidth(recipeName) / 2, 37, Color.WHITE.getRGB());
     }
 

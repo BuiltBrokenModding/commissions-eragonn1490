@@ -1,4 +1,5 @@
 tile.craftingblockmod:painter.name=Painter Bench
+tile.craftingblockmod:painter.recipe.none=No Recipe
 
 item.craftingblockmod:brush.name=Paint Brush
 
