@@ -13,15 +13,18 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.ItemStackHandler;
 
 /**
+ * Base class for crafter machines that use a input, output, power item, and tool item.
+ *
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 8/19/2018.
  */
 public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEntity implements IDescMessageTile, ITickable
 {
     public static final String NBT_INVENTORY = "inventory";
-    public static final String NBT_ON_STATE = "machine_on";
-    public static final String NBT_RECIPE_NAME = "recipe_name";
-    public static final String NBT_RECIPE_TICKS = "canDoRecipe";
+    public static final String NBT_ON_STATE = "machineEnabled";
+    public static final String NBT_RECIPE_NAME = "recipeName";
+    public static final String NBT_RECIPE_TICKS = "recipeTicks";
+    public static final String NBT_CAN_DO_RECIPE = "recipeCanDo";
 
     public static final int OUTPUT_SLOT = 0;
     public static final int POWER_SLOT = 1;
@@ -30,22 +33,59 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
 
     public int recipeIndex = 0;
 
+    /** Toggle state if the machine is on */
     public boolean machineOn = false;
+    /** Check state if the machine can do the recipe */
     public boolean canDoRecipe = false;
+    /** Toggle state to sync packet data next tick */
     public boolean syncClient = false;
 
+    /** Ticks left on recipe or until next recipe check */
     public int recipeTicks;
 
+    /**
+     * Inventory for this machine
+     *
+     * @return inventory
+     */
     public abstract ItemStackHandler getInventory();
 
+    /**
+     * Registry name of the current recipe. Used for
+     * syncing recipe to client
+     *
+     * @return registry name of current recipe, none for null
+     */
     public abstract String getRecipeName();
 
+    /**
+     * Gets the index of the recipe
+     *
+     * @param resourceLocation - recipe registry name
+     * @return index or -1 for not found
+     */
     public abstract int getIndexForRecipe(ResourceLocation resourceLocation);
 
+    /**
+     * Gets the number of recipes for the machine
+     *
+     * @return recipe count
+     */
     public abstract int getRecipeCount();
 
+    /**
+     * Gets the current recipe object
+     *
+     * @return recipe, or null for nothing selected
+     */
     public abstract R getCurrentRecipe();
 
+    /**
+     * Checks if the input is a tool for the machine
+     *
+     * @param stack - item
+     * @return true if tool
+     */
     public abstract boolean isTool(ItemStack stack);
 
     @Override
@@ -62,13 +102,13 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
                 //Only do logic if a recipe is active
                 if (currentRecipe != null)
                 {
-                    //If no recipe try to find one (delay to avoid wasting CPU time)
+                    //Check recipe state
                     if (!canDoRecipe && recipeTicks-- <= 0)
                     {
                         //Check if we can do recipe
                         checkRecipe();
 
-                        //If can do recipe set timer to recipe
+                        //If can't do recipe, reset check timer
                         if (!canDoRecipe)
                         {
                             recipeTicks = 10;
@@ -83,24 +123,26 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
                         {
                             //Consume power
                             consumeWorkerPower();
+                            canDoRecipe = false;
                         }
-                        else
+                        //Error state reset if something change to cause recipe to fail
+                        else if (recipeTicks <= -10)
                         {
-                            recipeTicks++; //keeps ticks from under flowing
+                            canDoRecipe = false;
                         }
                     }
                 }
             }
 
-            if (syncClient)
-            {
-                syncClient = false;
-            }
-
+            //Update client
             NetworkHandler.sendToAllAround(this, new MessageDesc(this));
         }
     }
 
+    /**
+     * Checks if the recipe can be processed
+     * aka has all components and energy needed
+     */
     protected void checkRecipe()
     {
         final R currentRecipe = getCurrentRecipe();
@@ -117,6 +159,14 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
         }
     }
 
+    /**
+     * Toggles to the next selected recipe. Will
+     * wrap back to -1 (none) if goes above recipe
+     * count. Will wrap to (recipe count - 1) if goes
+     * bellow -1
+     *
+     * @param next -true to move forward
+     */
     public void toggleRecipe(boolean next)
     {
         //Cycle index
@@ -147,6 +197,9 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
         recipeTicks = 10;
     }
 
+    /**
+     * Called to consume worker power
+     */
     protected void consumeWorkerPower()
     {
         ItemStack stack = getInventory().getStackInSlot(POWER_SLOT);
@@ -156,6 +209,12 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
         }
     }
 
+    /**
+     * Called to check if there is a worker
+     * with enough power to do the recipe.
+     *
+     * @return true if enough worker power
+     */
     protected boolean hasWorkerPower()
     {
         ItemStack stack = getInventory().getStackInSlot(POWER_SLOT);
@@ -166,6 +225,11 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
         return false;
     }
 
+    /**
+     * Gets the number of uses left on the tool
+     *
+     * @return 0 if no uses or no tool, else tool uses left
+     */
     public int getToolUses()
     {
         ItemStack stack = getInventory().getStackInSlot(TOOL_SLOT);
@@ -176,6 +240,12 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
         return 0;
     }
 
+    /**
+     * Will use the tool. When tool goes to or bellow
+     * zero uses it will break
+     *
+     * @param uses - number of uses to use
+     */
     public void useTool(int uses)
     {
         ItemStack stack = getInventory().getStackInSlot(TOOL_SLOT);
@@ -210,7 +280,7 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
     @Override
     public NBTTagCompound writeDescMessage(NBTTagCompound tagCompound)
     {
-        tagCompound.setBoolean("canDoRecipe", canDoRecipe);
+        tagCompound.setBoolean(NBT_CAN_DO_RECIPE, canDoRecipe);
         tagCompound.setInteger(NBT_RECIPE_TICKS, recipeTicks);
         tagCompound.setBoolean(NBT_ON_STATE, machineOn);
         tagCompound.setString(NBT_RECIPE_NAME, getRecipeName());
@@ -220,7 +290,7 @@ public abstract class TileEntityCrafter<R extends CrafterRecipe> extends TileEnt
     @Override
     public void readDescMessage(NBTTagCompound tagCompound)
     {
-        canDoRecipe = tagCompound.getBoolean("canDoRecipe");
+        canDoRecipe = tagCompound.getBoolean(NBT_CAN_DO_RECIPE);
         recipeTicks = tagCompound.getInteger(NBT_RECIPE_TICKS);
         machineOn = tagCompound.getBoolean(NBT_ON_STATE);
         String recipeName = tagCompound.getString(NBT_RECIPE_NAME);
