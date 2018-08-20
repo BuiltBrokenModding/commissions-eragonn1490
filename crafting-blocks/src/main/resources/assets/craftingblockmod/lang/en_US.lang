@@ -1,9 +1,30 @@
 tile.craftingblockmod:painter.name=Painter Bench
 tile.craftingblockmod:painter.recipe.none=No Recipe
 
+tile.craftingblockmod:stone.cutter.name=Stone Cutter Bench
+
 item.craftingblockmod:brush.name=Paint Brush
+item.craftingblockmod:chisel.name=Stone Cutter Chisel
 
 item.craftingblockmod:power.default.name=Basic Worker
 item.craftingblockmod:power.librarian.name=Librarian Worker
 item.craftingblockmod:power.painter.name=Painter Worker
 item.craftingblockmod:power.craftsman.name=Craftsman Worker
+
+
+recipe.painting.wool.white=White Wool
+recipe.painting.wool.orange=Orange Wool
+recipe.painting.wool.magenta=Magenta Wool
+recipe.painting.wool.lightBlue=Light Blue Wool
+recipe.painting.wool.yellow=Yellow Wool
+recipe.painting.wool.lime=Lime Wool
+recipe.painting.wool.pink=Pink Wool
+recipe.painting.wool.gray=Gray Wool
+recipe.painting.wool.silver=Silver Wool
+recipe.painting.wool.cyan=Cyan Wool
+recipe.painting.wool.purple=Purple Wool
+recipe.painting.wool.blue=Blue Wool
+recipe.painting.wool.brown=Brown Wool
+recipe.painting.wool.green=Green Wool
+recipe.painting.wool.red=Red Wool
+recipe.painting.wool.black=Black Wool

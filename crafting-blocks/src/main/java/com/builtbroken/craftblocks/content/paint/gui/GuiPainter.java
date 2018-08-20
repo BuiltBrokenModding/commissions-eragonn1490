@@ -98,7 +98,7 @@ public class GuiPainter extends GuiContainer
 
         //Display recipe
         PainterRecipe recipe = painter.getCurrentRecipe();
-        final String recipeName = I18n.format((recipe != null ? recipe.unlocalizedName : (CraftingBlocks.blockPainter.getUnlocalizedName() + ".recipe.none")));
+        final String recipeName = I18n.format((recipe != null ? TileEntityPainter.RECIPE_UNLOCALIZATION_PREFX + recipe.unlocalizedName : (CraftingBlocks.blockPainter.getUnlocalizedName() + ".recipe.none")));
         this.fontRenderer.drawString(recipeName, this.xSize / 2 - this.fontRenderer.getStringWidth(recipeName) / 2, 37, Color.WHITE.getRGB());
     }
 
