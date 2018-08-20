@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
@@ -52,14 +53,16 @@ public class MessagePainterRecipeToggle extends MessageTile
         public MessageTile onMessage(MessagePainterRecipeToggle message, MessageContext ctx)
         {
             World world = message.getWorld(ctx);
-            if (world != null && world.provider.getDimension() == message.dim)
+            if (world != null && !world.isRemote && world.provider.getDimension() == message.dim)
             {
                 if (world.isBlockLoaded(message.blockPos))
                 {
                     TileEntity tile = world.getTileEntity(message.blockPos);
                     if (tile instanceof TileEntityPainter)
                     {
-                       ((TileEntityPainter) tile).toggleRecipe(message.increase); //TODO fire with tick delay
+                        ((WorldServer) world).addScheduledTask(() -> {
+                            ((TileEntityPainter) tile).toggleRecipe(message.increase);
+                        });
                     }
                 }
             }

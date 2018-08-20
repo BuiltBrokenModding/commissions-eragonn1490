@@ -1,6 +1,7 @@
 package com.builtbroken.craftblocks.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +25,7 @@ public class MessageDesc extends MessageTile
 
     public MessageDesc(IDescMessageTile tile)
     {
-        this.dim = ((TileEntity)tile).getWorld().provider.getDimension();
+        this.dim = ((TileEntity) tile).getWorld().provider.getDimension();
         this.blockPos = ((TileEntity) tile).getPos();
         this.tag = tile.writeDescMessage(new NBTTagCompound());
     }
@@ -77,7 +78,7 @@ public class MessageDesc extends MessageTile
                     TileEntity tile = world.getTileEntity(message.blockPos);
                     if (tile instanceof IDescMessageTile)
                     {
-                        ((IDescMessageTile) tile).readDescMessage(message.tag);
+                        Minecraft.getMinecraft().addScheduledTask(() -> ((IDescMessageTile) tile).readDescMessage(message.tag));
                     }
                 }
             }

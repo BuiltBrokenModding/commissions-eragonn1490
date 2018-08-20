@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
@@ -59,8 +60,10 @@ public class MessageOnState extends MessageTile
                     TileEntity tile = world.getTileEntity(message.blockPos);
                     if (tile instanceof TileEntityPainter)
                     {
-                       ((TileEntityPainter) tile).machineOn = message.onState;  //TODO fire with tick delay
-                       ((TileEntityPainter) tile).syncClient = true;
+                        ((WorldServer)world).addScheduledTask(() -> {
+                            ((TileEntityPainter) tile).machineOn = message.onState;
+                            ((TileEntityPainter) tile).syncClient = true;
+                        });
                     }
                 }
             }
