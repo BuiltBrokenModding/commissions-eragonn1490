@@ -17,6 +17,7 @@ public class ClientReg
     public static void registerAllModels(ModelRegistryEvent event)
     {
         ModelLoader.setCustomModelResourceLocation(CraftingBlocks.itemBlockPainter,0, new ModelResourceLocation(CraftingBlocks.itemBlockPainter.getRegistryName(), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(CraftingBlocks.itemBlockStoneCutter,0, new ModelResourceLocation(CraftingBlocks.itemBlockStoneCutter.getRegistryName(), "inventory"));
 
         ModelLoader.setCustomModelResourceLocation(CraftingBlocks.itemPaintBrush,0, new ModelResourceLocation(CraftingBlocks.itemPaintBrush.getRegistryName(), "inventory"));
         ModelLoader.setCustomModelResourceLocation(CraftingBlocks.itemStoneChisel,0, new ModelResourceLocation(CraftingBlocks.itemStoneChisel.getRegistryName(), "inventory"));

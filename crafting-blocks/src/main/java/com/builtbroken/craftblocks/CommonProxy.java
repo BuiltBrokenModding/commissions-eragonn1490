@@ -2,6 +2,8 @@ package com.builtbroken.craftblocks;
 
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import com.builtbroken.craftblocks.content.paint.gui.ContainerPainter;
+import com.builtbroken.craftblocks.content.stone.TileEntityStoneCutter;
+import com.builtbroken.craftblocks.content.stone.gui.ContainerStoneCutter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +28,10 @@ public class CommonProxy implements IGuiHandler
             if(tile instanceof TileEntityPainter)
             {
                 return new ContainerPainter(player, (TileEntityPainter) tile);
+            }
+            else if(tile instanceof TileEntityStoneCutter)
+            {
+                return new ContainerStoneCutter(player, (TileEntityStoneCutter) tile);
             }
         }
         return null;

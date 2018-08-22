@@ -1,6 +1,6 @@
 package com.builtbroken.craftblocks.network;
 
-import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
+import com.builtbroken.craftblocks.content.TileEntityCrafter;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -58,11 +58,11 @@ public class MessageOnState extends MessageTile
                 if (world.isBlockLoaded(message.blockPos))
                 {
                     TileEntity tile = world.getTileEntity(message.blockPos);
-                    if (tile instanceof TileEntityPainter)
+                    if (tile instanceof TileEntityCrafter)
                     {
                         ((WorldServer)world).addScheduledTask(() -> {
-                            ((TileEntityPainter) tile).machineOn = message.onState;
-                            ((TileEntityPainter) tile).syncClient = true;
+                            ((TileEntityCrafter) tile).machineOn = message.onState;
+                            ((TileEntityCrafter) tile).syncClient = true;
                         });
                     }
                 }

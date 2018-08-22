@@ -1,6 +1,7 @@
 package com.builtbroken.craftblocks.content.paint;
 
 import com.builtbroken.craftblocks.content.CrafterRecipe;
+import com.builtbroken.craftblocks.content.TileEntityCrafter;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 
@@ -52,7 +53,7 @@ public class PainterRecipe extends CrafterRecipe<PainterRecipe, TileEntityPainte
         }
 
         //Check that we have expect input
-        ItemStack inputStack = painter.inventory.extractItem(TileEntityPainter.INPUT_SLOT, input.getCount(), true);
+        ItemStack inputStack = painter.inventory.extractItem(TileEntityCrafter.INPUT_SLOT, input.getCount(), true);
         if (!isMatchingItem(inputStack, input))
         {
             return false;
@@ -69,7 +70,7 @@ public class PainterRecipe extends CrafterRecipe<PainterRecipe, TileEntityPainte
         }
 
         //Check if we can output the item (simulated)
-        return painter.inventory.insertItem(TileEntityPainter.OUTPUT_SLOT, output, true).isEmpty();
+        return painter.inventory.insertItem(TileEntityCrafter.OUTPUT_SLOT, output, true).isEmpty();
     }
 
     @Override
@@ -81,7 +82,7 @@ public class PainterRecipe extends CrafterRecipe<PainterRecipe, TileEntityPainte
             painter.useTool(brushUses);
 
             //Consume input
-            painter.inventory.extractItem(TileEntityPainter.INPUT_SLOT, input.getCount(), false);
+            painter.inventory.extractItem(TileEntityCrafter.INPUT_SLOT, input.getCount(), false);
 
             //Consume dye
             for (Map.Entry<EnumDyeColor, Integer> entry : dyeToUsage.entrySet())
@@ -90,7 +91,7 @@ public class PainterRecipe extends CrafterRecipe<PainterRecipe, TileEntityPainte
             }
 
             //Output item
-            painter.inventory.insertItem(TileEntityPainter.OUTPUT_SLOT, output.copy(), false);
+            painter.inventory.insertItem(TileEntityCrafter.OUTPUT_SLOT, output.copy(), false);
 
             return true;
         }

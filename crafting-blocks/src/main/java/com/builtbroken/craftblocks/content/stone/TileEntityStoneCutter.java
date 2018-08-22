@@ -21,7 +21,7 @@ public class TileEntityStoneCutter extends TileEntityCrafter
     public static final int SPECIAL_SLOT = 4;
 
     //recipe.painting.mod:item.name
-    public static final String RECIPE_UNLOCALIZATION_PREFX = "recipe.cutter.stone";
+    public static final String RECIPE_UNLOCALIZATION_PREFX = "recipe.cutter.stone.";
 
     /** Supported recipes */
     public static final List<StoneCutterRecipe> recipes = new ArrayList();

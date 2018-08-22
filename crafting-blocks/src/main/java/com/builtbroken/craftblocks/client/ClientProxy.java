@@ -3,6 +3,8 @@ package com.builtbroken.craftblocks.client;
 import com.builtbroken.craftblocks.CommonProxy;
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
 import com.builtbroken.craftblocks.content.paint.gui.GuiPainter;
+import com.builtbroken.craftblocks.content.stone.TileEntityStoneCutter;
+import com.builtbroken.craftblocks.content.stone.gui.GuiStoneCutter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -30,6 +32,10 @@ public class ClientProxy extends CommonProxy
             if(tile instanceof TileEntityPainter)
             {
                 return new GuiPainter(player, (TileEntityPainter) tile);
+            }
+            else if(tile instanceof TileEntityStoneCutter)
+            {
+                return new GuiStoneCutter(player, (TileEntityStoneCutter) tile);
             }
         }
         return null;

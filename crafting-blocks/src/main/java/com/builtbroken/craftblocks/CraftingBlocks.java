@@ -5,6 +5,9 @@ import com.builtbroken.craftblocks.content.item.ItemCraftingTool;
 import com.builtbroken.craftblocks.content.paint.BlockPainter;
 import com.builtbroken.craftblocks.content.paint.PainterRecipe;
 import com.builtbroken.craftblocks.content.paint.TileEntityPainter;
+import com.builtbroken.craftblocks.content.stone.BlockStoneCutter;
+import com.builtbroken.craftblocks.content.stone.StoneCutterRecipe;
+import com.builtbroken.craftblocks.content.stone.TileEntityStoneCutter;
 import com.builtbroken.craftblocks.network.NetworkHandler;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -38,8 +41,10 @@ public class CraftingBlocks
     public static final String PREFIX = DOMAIN + ":";
 
     public static Block blockPainter;
+    public static Block blockStoneCutter;
 
     public static Item itemBlockPainter;
+    public static Item itemBlockStoneCutter;
 
     public static ItemCraftingTool itemPaintBrush;
     public static ItemCraftingTool itemStoneChisel;
@@ -77,12 +82,28 @@ public class CraftingBlocks
                     enumDyeColor
                     ).setRegistryName(PREFIX + "wool." + enumDyeColor.getName()));
         }
+
+        TileEntityStoneCutter.registerRecipe(new StoneCutterRecipe("stone.brick",
+                new ItemStack(Blocks.STONE, 1, 0),
+                new ItemStack(Blocks.STONEBRICK, 1, 0),
+                ItemStack.EMPTY).setRegistryName(PREFIX + "stone.brick"));
+
+        TileEntityStoneCutter.registerRecipe(new StoneCutterRecipe("stone.cracked",
+                new ItemStack(Blocks.STONE, 1, 0),
+                new ItemStack(Blocks.STONEBRICK, 1, 2),
+                ItemStack.EMPTY).setRegistryName(PREFIX + "stone.cracked"));
+
+        TileEntityStoneCutter.registerRecipe(new StoneCutterRecipe("stone.chiseled",
+                new ItemStack(Blocks.STONE, 1, 0),
+                new ItemStack(Blocks.STONEBRICK, 1, 3),
+                ItemStack.EMPTY).setRegistryName(PREFIX + "stone.chiseled"));
     }
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().register(itemBlockPainter = new ItemBlock(blockPainter).setRegistryName(blockPainter.getRegistryName()));
+        event.getRegistry().register(itemBlockStoneCutter = new ItemBlock(blockStoneCutter).setRegistryName(blockStoneCutter.getRegistryName()));
 
         event.getRegistry().register(itemPaintBrush = new ItemCraftingTool("brush", 100));
         event.getRegistry().register(itemStoneChisel = new ItemCraftingTool("chisel", 100));
@@ -97,8 +118,10 @@ public class CraftingBlocks
     public static void registerBlocks(RegistryEvent.Register<Block> event)
     {
         event.getRegistry().register(blockPainter = new BlockPainter());
+        event.getRegistry().register(blockStoneCutter = new BlockStoneCutter());
 
         GameRegistry.registerTileEntity(TileEntityPainter.class, PREFIX + "painter_block");
+        GameRegistry.registerTileEntity(TileEntityStoneCutter.class, PREFIX + "stone_cutter");
     }
 
     public void setModMetadata(String id, String name, ModMetadata metadata)

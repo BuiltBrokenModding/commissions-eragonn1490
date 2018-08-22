@@ -11,7 +11,6 @@ item.craftingblockmod:power.librarian.name=Librarian Worker
 item.craftingblockmod:power.painter.name=Painter Worker
 item.craftingblockmod:power.craftsman.name=Craftsman Worker
 
-
 recipe.painting.wool.white=White Wool
 recipe.painting.wool.orange=Orange Wool
 recipe.painting.wool.magenta=Magenta Wool
@@ -28,3 +27,7 @@ recipe.painting.wool.brown=Brown Wool
 recipe.painting.wool.green=Green Wool
 recipe.painting.wool.red=Red Wool
 recipe.painting.wool.black=Black Wool
+
+recipe.cutter.stone.stone.brick=Brick
+recipe.cutter.stone.stone.cracked=Brick Cracked
+recipe.cutter.stone.stone.chiseled=Brick Chiseled
