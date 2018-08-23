@@ -23,7 +23,7 @@ public class TileEntityPainter extends TileEntityCrafter<PainterRecipe>
     public static final int DYE_SLOT_START = 4;
 
     //recipe.painting.mod:item.name
-    public static final String RECIPE_UNLOCALIZATION_PREFX = "recipe.painting";
+    public static final String RECIPE_UNLOCALIZATION_PREFX = "recipe.painting.";
 
     /** Supported recipes */
     public static final List<PainterRecipe> recipes = new ArrayList();
